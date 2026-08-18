@@ -38,9 +38,9 @@ Have I Been Flocked aggregates audit logs released through FOIA and public-recor
 
 The collection is incomplete and delayed. New records depend on public-records releases and can arrive months or years after the underlying search.
 
-## Passive Trigger Direction
+## Travel Inference Direction
 
-Once the household registry contains one or more vehicles, the primary trigger is any credible indication that the user or another household member traveled outside the home. The agent reasons about the conversation and available context rather than matching a fixed phrase list.
+Once the household registry contains one or more vehicles, the automatic new-session review looks for any credible indication that the user or another household member traveled outside the home. The agent reasons about the recent history and memory available from the host rather than matching a fixed phrase list.
 
 The travel indication can describe preparation, current movement, arrival, or a completed outing. The evidence families below are examples for reasoning and testing. They are not an exhaustive trigger vocabulary.
 
@@ -60,19 +60,20 @@ Related signals contribute to one mobility episode. They do not cause repeated l
 
 ### Trigger Architecture
 
-A standalone skill supports explicit invocation and implicit invocation when the user's task matches the skill description. Broad household-travel detection requires an additional lifecycle entry point because the skill description alone cannot guarantee evaluation at session boundaries.
+Flock Me has exactly two activation paths:
 
-The first implementation should package Flock Me as a plugin containing:
+1. a new-session review of available recent history and memory for household travel;
+2. explicit invocation through Flock Me's enabled skill command.
 
-1. the Flock Me skill for reasoning, enrollment, lookup, and result handling;
-2. a `SessionStart` hook that runs on `startup`, `resume`, `clear`, and `compact`;
-3. a small persistent state store containing the household registry, last evaluation checkpoint, and previously seen result identifiers.
+The first implementation packages the Flock Me skill with:
 
-The `SessionStart` hook adds compact developer context to the first ordinary model request. That context instructs the agent to review the context available since the last checkpoint, reason about whether any household travel occurred, and invoke the skill when appropriate. This design reuses a model turn that is already happening and avoids a continuously running inference process.
+1. a `SessionStart` hook limited to a new session;
+2. a persistent state store containing the household registry, last evaluation checkpoint, and previously seen result identifiers;
+3. skill metadata with `allow_implicit_invocation: false`.
 
-Mid-session travel indications remain eligible for normal implicit skill invocation through the skill description. The first version does not add a `UserPromptSubmit` hook on every turn. Missed mid-session detections should be measured before adding that per-turn context and reasoning cost.
+The `SessionStart` hook adds compact developer context to the first ordinary model request. That context instructs the agent to review the context available since the last checkpoint, reason about whether household travel occurred, and invoke the skill when appropriate. This reuses a model turn that is already happening and avoids a continuously running inference process.
 
-Scheduled tasks are suitable for periodic refreshes. They do not represent a session-start event and are outside the first trigger design.
+Ordinary mid-session travel remarks do not activate the skill. All activation outside the new-session review is explicit.
 
 The hook receives a `transcript_path` when one is available. OpenAI documents that transcript format as unstable, so direct transcript parsing remains a constrained implementation detail. The preferred hook output is a short reasoning instruction for the agent rather than a second transcript-analysis subsystem.
 
@@ -157,9 +158,11 @@ Persistent Codex memory behavior remains a separate design decision because a su
 - Enrollment accepts license plate as the sole lookup identity.
 - The local registry supports multiple household vehicles across sessions.
 - Each normalized plate maps to one registry entry.
-- Any credible household travel indication enters mobility reasoning.
+- The new-session review evaluates credible household travel indications.
 - Travel detection uses semantic reasoning rather than a fixed trigger phrase list.
 - Session-start evaluation occurs inside the first ordinary model turn.
+- Ordinary mid-session travel remarks do not activate the skill.
+- Explicit invocation bypasses travel inference.
 - Mobility context activates relevance assessment.
 - One bounded mobility episode produces at most one service request, containing one or more enrolled identifiers.
 - A result states exactly that an operator searched the plate.
@@ -181,7 +184,7 @@ Persistent Codex memory behavior remains a separate design decision because a su
 10. What default labels should distinguish multiple vehicles without retaining raw plates?
 11. What context is available to a `SessionStart` hook across separate chats and projects?
 12. How should the checkpoint record prevent repeated evaluation of the same context?
-13. What measured miss rate would justify adding a `UserPromptSubmit` hook?
+13. How should each supported Codex surface present the explicit Flock Me command?
 
 ## Next Design Step
 

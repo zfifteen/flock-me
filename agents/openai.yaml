@@ -1,0 +1,7 @@
+interface:
+  display_name: "Flock Me"
+  short_description: "Check public Flock searches for household vehicles"
+  default_prompt: "Use $flock-me to check enrolled household vehicles against public Flock audit records."
+
+policy:
+  allow_implicit_invocation: false
