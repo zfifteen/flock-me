@@ -18,3 +18,11 @@ This record contains accepted product and architecture decisions. Open questions
 | 2026-08-17 | Fail explicitly when an integration component is absent. | A missing adapter, state store, or verified normalization algorithm must never produce a fabricated or degraded result. |
 | 2026-08-17 | Support Codex, Claude Code, Grok Build, and Gemini CLI with separate packages. | The vendors share the Agent Skills format but differ in discovery paths, invocation controls, and lifecycle integration. |
 | 2026-08-17 | Keep one behavior contract across harness packages. | Vendor differences belong in frontmatter, invocation syntax, installation, and lifecycle adapters rather than product semantics. |
+| 2026-08-18 | Normalize plates with `trim` + `toLowerCase` before SHA-256. | Matches the Have I Been Flocked frontend observed on 2026-08-17. Hyphens stay; internal spaces are invalid. |
+| 2026-08-18 | Do not mix jurisdiction into the lookup token. | The source hash is plate-string-only, so identical strings from different states collide. |
+| 2026-08-18 | Implement the shared runtime as dependency-free ESM. | Node 18+ and browsers share `crypto.subtle`; harnesses can invoke it without a build step. |
+| 2026-08-18 | Persist portable state as versioned JSON under XDG config. | `$FLOCK_ME_STATE` or `~/.config/flock-me/state.json` is writable across Codex, Claude Code, Grok Build, and Gemini CLI. |
+| 2026-08-18 | Protect derived identifiers with `0700`/`0600` permissions, not encryption. | Eight hex characters are enumerable; encryption would imply a privacy boundary the token does not provide. |
+| 2026-08-18 | Keep live HIBF HTTP off until automated access is permitted. | The observed `POST /api/search/text` contract is documented; fixtures cover match, miss, redaction, and malformed records. |
+| 2026-08-18 | Keep setup available before the live service works. | Enrollment, consent, and inspect/delete do not depend on a permitted network lookup. |
+| 2026-08-18 | Default labels are `My car`, `Partner's car`, `Work truck`, `Household van`. | Multiple vehicles need non-sensitive local names; labels never leave the registry. |
