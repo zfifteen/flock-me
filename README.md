@@ -73,6 +73,7 @@ The public dataset is incomplete and delayed because it is assembled from public
 - [`docs/architecture.md`](docs/architecture.md) defines the component boundaries and execution flows.
 - [`docs/decisions.md`](docs/decisions.md) records accepted design decisions.
 - [`docs/harness-skill-specifications.md`](docs/harness-skill-specifications.md) records the official vendor formats and portability decisions.
+- [`docs/roadmap.md`](docs/roadmap.md) tracks the remaining research, implementation, testing, and release work.
 - [`assets/hero.png`](assets/hero.png) is the selected project banner.
 - [`assets/hero-candidates/`](assets/hero-candidates/) preserves the original banner explorations.
 
