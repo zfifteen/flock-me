@@ -1,38 +1,41 @@
 # Local data and threat model
 
-## Stored locally
+## Assets
 
-- Consent timestamp and setup-offer timestamp
-- Vehicle lookup tokens (8 hex chars) and local labels
-- Previously seen audit-record identifiers
+- Derived eight-character plate identifiers (lookup tokens).
+- Optional non-sensitive vehicle nicknames.
+- Previously seen audit-record identifiers.
+- Consent and setup-offer timestamps.
+- Session-review checkpoint and mobility-episode metadata.
 
-Raw license plates are discarded after derivation and must never appear in
-logs or persistent state.
+Raw license plates are not assets in persistent state. They exist only in working memory during derivation.
 
-## What a token is not
+## Not a cryptographic privacy boundary
 
-The 8-character SHA-256 prefix is a lookup key. Plate space is enumerable.
-Treat tokens as sensitive. Do not encrypt them as if they were a privacy
-boundary. Use restrictive permissions instead.
+The identifier is `sha256(utf8(lowercase(trim(plate))))[:8]`. Plate space is small enough to enumerate. Anyone who can read an identifier can test candidate plates against it. Treat identifiers as sensitive. Do not encrypt them as if they were a privacy boundary.
 
-## Portable file store
+## Storage
 
-- Path: `$FLOCK_ME_STATE` or `$XDG_CONFIG_HOME/flock-me/state.json`
-- Directory mode `0700`, file mode `0600`
-- Atomic write: temp file + rename
-- Concurrent writers fail closed via an exclusive lock file
+Portable CLI / harness runtimes (versioned JSON, atomic temp-file + rename, no encryption at rest):
 
-## Web household store
+| Runtime | Path | Permissions |
+| --- | --- | --- |
+| TypeScript (`runtime/src`) | `~/.flock-me/state.json` | directory `0700`, file `0600` |
+| ESM (`runtime/*.mjs`) | `$FLOCK_ME_STATE` or `$XDG_CONFIG_HOME/flock-me/state.json` | directory `0700`, file `0600`; exclusive lock file |
 
-Rows are scoped to the authenticated `user_id`. Server functions reject
-signed-out callers. The client never supplies the user id.
+Web household store (companion app): rows are scoped to the authenticated `user_id`. Server functions reject signed-out callers. The client never supplies the user id.
 
-## Log redaction
+## Threats
 
-Never log the enrollment input, the normalized plate, or the lookup token.
-User-facing validation errors may mention format, not the submitted value.
+| Threat | Mitigation |
+| --- | --- |
+| Disk read of state | `0700` / `0600`. Identifiers remain sensitive if the home directory is copied. |
+| Concurrent writers | Exclusive lock (ESM) or atomic rename. A second writer fails closed. |
+| Log leakage of a plate | Never log enrollment input, the normalized plate, or the lookup token. `redactLog()` is a last-line defense. User-facing errors may mention format, not the submitted value. |
+| Accidental plate persistence | Parser rejects `plate` / `licensePlate` / `rawPlate` fields. Atomic writer refuses those keys. |
+| Duplicate enrollment | Derived identifier is the uniqueness key. |
+| Fabricated lookup results | Missing or unpermitted service fails explicitly. No degraded fallback search. |
 
-## Live network
+## User control
 
-Have I Been Flocked automated access is unconfirmed. The adapter does not
-perform live HTTP. Fixture checks stay local.
+The user can list, rename, remove, inspect, and clear every locally stored Flock Me record. Setup remains available before the service integration is operational so a household can enroll now and delete later.

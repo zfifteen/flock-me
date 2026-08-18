@@ -16,7 +16,7 @@ When the user explicitly asks to install Flock Me from this repository:
 8. Report the installed source, target, and verification result.
 
 | Harness | Repository source | Default user installation target | Verification |
-| --- | --- | --- | --- |
+| --- | --- | --- |
 | Codex | `skills/codex/flock-me/` | `~/.agents/skills/flock-me/` | Open `/skills` or restart Codex if the skill does not appear |
 | Claude Code | `skills/claude/flock-me/` | `~/.claude/skills/flock-me/` | Invoke `/flock-me`; restart Claude Code if a newly created top-level skills directory is not detected |
 | Grok Build | `skills/grok-build/flock-me/` | `~/.grok/skills/flock-me/` | Run `grok inspect` or open `/skills` |
@@ -31,11 +31,11 @@ Use a project-scoped target only when the user requests one:
 
 ## Preserve the current implementation boundary
 
-The repository currently contains behavior contracts, not an operational lookup integration. The lifecycle hooks, persistent state store, verified plate-normalization code, and service adapter are not implemented.
+`runtime/` now provides plate normalization, household registry, portable state, and an explicit-fail Have I Been Flocked adapter. Session-start lifecycle hooks are not implemented. Live lookups are not permitted.
 
-Installation enables the harness-specific skill instructions and direct invocation surface. Do not claim that automatic new-session review or live record lookup works until the missing components have been implemented and validated for that harness.
+Installation enables the harness-specific skill instructions and direct invocation surface. Do not claim that automatic new-session review or live record lookup works.
 
-Do not request or retain a real license plate while the normalization and persistence implementation remains absent.
+Enrollment may accept a real plate only through the runtime. The raw plate must be discarded after derivation. Never persist or log the plate.
 
 ## Maintain the harness packages
 

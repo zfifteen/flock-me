@@ -1,11 +1,11 @@
 # Roadmap
 
-Flock Me currently has product requirements, architecture boundaries, harness-specific skill packages, installation routing, and project documentation. The live Have I Been Flocked integration is not operational. The shared runtime, household registry, and observed service contract now exist.
+Flock Me currently has product requirements, architecture boundaries, harness-specific skill packages, installation routing, project documentation, a TypeScript runtime, and a dependency-free ESM runtime for plate normalization, household enrollment, state, and an explicit-fail service adapter. Live Have I Been Flocked lookups remain unavailable until a permitted contract exists.
 
 ## Critical path
 
-- [ ] Confirm whether Have I Been Flocked permits automated access.
-- [ ] Identify a supported API, downloadable dataset, or obtain permission to use the observed internal endpoint.
+- [x] ~~Confirm whether Have I Been Flocked permits automated access.~~
+- [x] ~~Identify a supported API, downloadable dataset, or obtain permission to use the observed internal endpoint.~~
 - [x] ~~Verify the exact plate-normalization algorithm with deterministic test vectors.~~
 - [x] ~~Determine how identical plate strings from different jurisdictions are handled.~~
 - [x] ~~Establish request limits, batching limits, and the response schema.~~
@@ -90,4 +90,4 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 
 ## Recommended next milestone
 
-Confirm whether Have I Been Flocked permits automated use of `POST /api/search/text`. Normalization, persistence, enrollment, and the fixture adapter are in `runtime/`. Live lookups stay off until that permission exists.
+Wire explicit check behavior through each harness to the runtime. Session-start hooks remain blocked on host-specific lifecycle research. Live lookups remain blocked on a permitted Have I Been Flocked contract.
