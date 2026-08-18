@@ -59,28 +59,27 @@ Do not activate from an ordinary mid-session travel remark. Travel inference occ
 Use a license plate as the sole enrollment input. Support more than one household vehicle.
 
 1. Explain that Flock Me will derive and retain a lookup identifier for future audit checks.
-2. Obtain explicit permission before accepting the plate for enrollment.
-3. Normalize the plate locally using the verified Have I Been Flocked normalization algorithm.
-4. Compute the first eight hexadecimal characters of the normalized plate's SHA-256 hash.
-5. Store the derived identifier with an optional non-sensitive local label.
-6. Discard the raw plate immediately after derivation.
-7. Offer to enroll another household vehicle.
+2. Obtain explicit permission before accepting the plate for enrollment. Use the consent language in `docs/setup-copy.md`.
+3. Normalize the plate with `runtime/src/normalize.ts` (HIBF: lowercase, trim, SHA-256, first eight hex characters).
+4. Store the derived identifier with an optional non-sensitive local label via `runtime/src/registry.ts`.
+5. Discard the raw plate immediately after derivation.
+6. Offer to enroll another household vehicle.
 
 Treat the eight-character identifier as sensitive. It is a lookup token, not a cryptographic privacy boundary.
 
-Do not guess the normalization algorithm. If the project does not yet provide a verified implementation, stop enrollment and explain that normalization remains unimplemented.
+Do not invent a second hash. Do not send a raw plate anywhere.
 
 ## Perform a lookup
 
 1. Load the enrolled identifiers selected by the entry-point workflow.
-2. Submit the identifiers together through the project-provided Have I Been Flocked adapter.
+2. Submit the identifiers together through `runtime/src/adapter.ts`.
 3. Compare returned records with the stored seen-record identifiers.
 4. Persist newly observed record identifiers before reporting them.
 5. Associate the lookup with the mobility episode or explicit invocation that caused it.
 
 One mobility episode produces at most one service request. Never send a raw plate to the service.
 
-If the project-provided service adapter or persistent state store is absent, stop and state which component is unavailable. Do not invent results, substitute an unrelated search method, or silently degrade the check.
+If the adapter returns `SERVICE_UNAVAILABLE`, or if persistent state is missing, stop and state which component is unavailable. Do not invent results, substitute an unrelated search method, or silently degrade the check.
 
 ## Report results
 
@@ -103,7 +102,7 @@ Never imply that the travel evidence and audit record describe the same event un
 
 ## Maintain state
 
-Persist the minimum state required across sessions:
+Persist the minimum state required across sessions in `~/.flock-me/state.json` (`runtime/src/state.ts`):
 
 - enrolled vehicle identifiers and optional labels;
 - the last session-review checkpoint;
@@ -114,4 +113,4 @@ Keep raw plates out of persistent state. Use deterministic identifiers and check
 
 ## Respect the implementation boundary
 
-This draft defines agent behavior. It does not provide the lifecycle hook, persistence implementation, normalization code, or service adapter. Treat each missing component as unimplemented until the project supplies it.
+Normalization, household registry, portable state, and the explicit-fail service adapter now live in `runtime/`. Session-start lifecycle hooks are still unimplemented. If the adapter returns `SERVICE_UNAVAILABLE`, say so. Do not invent results or open haveibeenflocked.com on the user's behalf.
