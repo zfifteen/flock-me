@@ -14,6 +14,24 @@ The skill treats movement as a bounded mobility episode. It checks once per epis
 
 The project began with a joke about connecting OpenAI Computer History to Flock Safety cameras. The functional version creates an ironic symmetry: Codex remembers the user's digital context while Flock Me can bring public records of institutional attention toward the user's vehicle into the conversation.
 
+## Product Positioning
+
+**Know when your household's vehicles have been searched through the Flock surveillance network.**
+
+Flock Me connects Codex directly to public, FOIA-derived Flock Safety audit records. The user enrolls household license plates once, and Codex can discover when a Flock user searched for one of those vehicles.
+
+When records are available, Flock Me reveals the institutional trail: the searching agency, operator, date, stated reason, case number, search type, and network reach.
+
+Contextual travel detection makes the integration effortless. When conversations or computer activity indicate that someone in the household traveled, Flock Me recognizes the opportunity and checks the enrolled vehicles. The user receives relevant findings without repeatedly entering plates, visiting a separate website, or remembering to perform manual searches.
+
+Each result answers a precise question:
+
+> Has someone using Flock searched for one of our vehicles?
+
+Flock Me turns scattered public surveillance records into persistent personal awareness inside Codex.
+
+**They built a network to search your movements. Flock Me gives you a window into who searched.**
+
 ## Verified Data Meaning
 
 Have I Been Flocked aggregates audit logs released through FOIA and public-records requests. A matching record establishes that a Flock customer searched for a plate. The record provides no proof that a camera photographed the vehicle, that the vehicle traveled through a specific location, or that the vehicle owner was investigated.
