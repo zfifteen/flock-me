@@ -22,7 +22,9 @@ The collection is incomplete and delayed. New records depend on public-records r
 
 ## Passive Trigger Direction
 
-The primary trigger is a detected mobility episode: context indicating that the user is preparing to leave home, is currently away, or is discussing a completed outing.
+Once the household registry contains one or more vehicles, the primary trigger is any credible indication that the user or another household member traveled outside the home. The agent reasons about the conversation and available context rather than matching a fixed phrase list.
+
+The travel indication can describe preparation, current movement, arrival, or a completed outing. The evidence families below are examples for reasoning and testing. They are not an exhaustive trigger vocabulary.
 
 Strong trigger families include:
 
@@ -37,6 +39,24 @@ Strong trigger families include:
 - retrospective requests to reconstruct a day, outing, or trip.
 
 Related signals contribute to one mobility episode. They do not cause repeated lookups during the same episode.
+
+### Trigger Architecture
+
+A standalone skill supports explicit invocation and implicit invocation when the user's task matches the skill description. Broad household-travel detection requires an additional lifecycle entry point because the skill description alone cannot guarantee evaluation at session boundaries.
+
+The first implementation should package Flock Me as a plugin containing:
+
+1. the Flock Me skill for reasoning, enrollment, lookup, and result handling;
+2. a `SessionStart` hook that runs on `startup`, `resume`, `clear`, and `compact`;
+3. a small persistent state store containing the household registry, last evaluation checkpoint, and previously seen result identifiers.
+
+The `SessionStart` hook adds compact developer context to the first ordinary model request. That context instructs the agent to review the context available since the last checkpoint, reason about whether any household travel occurred, and invoke the skill when appropriate. This design reuses a model turn that is already happening and avoids a continuously running inference process.
+
+Mid-session travel indications remain eligible for normal implicit skill invocation through the skill description. The first version does not add a `UserPromptSubmit` hook on every turn. Missed mid-session detections should be measured before adding that per-turn context and reasoning cost.
+
+Scheduled tasks are suitable for periodic refreshes. They do not represent a session-start event and are outside the first trigger design.
+
+The hook receives a `transcript_path` when one is available. OpenAI documents that transcript format as unstable, so direct transcript parsing remains a constrained implementation detail. The preferred hook output is a short reasoning instruction for the agent rather than a second transcript-analysis subsystem.
 
 ### Activation Levels
 
@@ -76,6 +96,15 @@ When a mobility episode identifies a particular enrolled vehicle, the skill chec
 
 Natural enrollment opportunities include user-provided registrations, insurance documents, parking or toll notices, traffic citations, repair invoices, or intentional vehicle photographs. Codex should identify the presence of a plate-like value and request permission before using it. Silent extraction or enrollment is outside the current design.
 
+### Setup Entrypoints
+
+The skill supports two setup paths:
+
+1. **First post-install session:** The `SessionStart` hook finds an empty household registry and instructs the agent to offer Flock Me setup once.
+2. **Explicit setup command:** The user invokes `$flock-me` with a setup request at any time to enroll, list, rename, or remove household vehicles.
+
+An interactive installer lifecycle is not established by the current OpenAI documentation. The first post-install session provides the installation-adjacent setup experience using a documented lifecycle hook.
+
 ## Input Decision and Service Findings
 
 The product accepts license plate as its only lookup enrollment input. Names, addresses, vehicle descriptions, agencies, operators, reasons, and case numbers do not identify the user's vehicle reliably.
@@ -110,6 +139,9 @@ Persistent Codex memory behavior remains a separate design decision because a su
 - Enrollment accepts license plate as the sole lookup identity.
 - The local registry supports multiple household vehicles across sessions.
 - Each normalized plate maps to one registry entry.
+- Any credible household travel indication enters mobility reasoning.
+- Travel detection uses semantic reasoning rather than a fixed trigger phrase list.
+- Session-start evaluation occurs inside the first ordinary model turn.
 - Mobility context activates relevance assessment.
 - One bounded mobility episode produces at most one service request, containing one or more enrolled identifiers.
 - A result states exactly that an operator searched the plate.
@@ -126,13 +158,16 @@ Persistent Codex memory behavior remains a separate design decision because a su
 5. Which Codex mechanism can persist the household vehicle registry and previously seen record identifiers across sessions?
 6. Can a skill write supported persistent memory, or should the project use repo-local state?
 7. What confidence threshold should open a mobility episode?
-8. Should the first mobility trigger offer enrollment, or should installation include a dedicated setup exchange?
+8. What wording should the first post-install setup offer use?
 9. Which result conditions justify interrupting an unrelated conversation?
 10. What default labels should distinguish multiple vehicles without retaining raw plates?
+11. What context is available to a `SessionStart` hook across separate chats and projects?
+12. How should the checkpoint record prevent repeated evaluation of the same context?
+13. What measured miss rate would justify adding a `UserPromptSubmit` hook?
 
 ## Next Design Step
 
-Choose the supported local persistence mechanism for the household vehicle registry. Then design the one-time enrollment conversation and define the mobility episode state and the exact conditions for offering a check, performing a check, and surfacing a result.
+Choose the supported local persistence mechanism for the household vehicle registry and checkpoint state. Then prototype the `SessionStart` reasoning instruction and test it against representative session openings containing direct, indirect, and absent household-travel evidence.
 
 ## Primary Sources
 
@@ -143,3 +178,6 @@ Choose the supported local persistence mechanism for the household vehicle regis
 - [Surveillance details and identifier use](https://haveibeenflocked.com/news/longterm-tracking)
 - [Data redaction policy](https://haveibeenflocked.com/about/privacy)
 - [Visitor privacy policy](https://haveibeenflocked.com/about/privacy-policy)
+- [OpenAI skill invocation and packaging](https://learn.chatgpt.com/docs/build-skills)
+- [OpenAI Codex lifecycle hooks](https://learn.chatgpt.com/docs/hooks)
+- [OpenAI scheduled tasks](https://learn.chatgpt.com/docs/automations)
