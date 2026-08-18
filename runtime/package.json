@@ -1,0 +1,13 @@
+{
+  "name": "@flock-me/runtime",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Portable Flock Me plate normalization, household registry, state, and service adapter.",
+  "scripts": {
+    "test": "node --experimental-strip-types --test src/*.test.ts"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
