@@ -1,3 +1,5 @@
+![Flock Me propaganda-style goose operating a surveillance camera](assets/hero.png)
+
 # Flock Me
 
 Flock Me lets users know when public records show that someone using the Flock surveillance network searched for an enrolled household vehicle.
