@@ -6,19 +6,19 @@
 
 ## Strongest Current Concept
 
-Flock Me is a satirical, functional Codex skill that recognizes evidence of a user's movement outside the home and checks public, FOIA-derived Flock Safety audit records for the user's enrolled household vehicles.
+Flock Me is a satirical, functional Agent Skill for Codex, Claude Code, Grok Build, and Gemini CLI. It recognizes evidence of a user's movement outside the home and checks public, FOIA-derived Flock Safety audit records for the user's enrolled household vehicles.
 
 The skill treats movement as a bounded mobility episode. It checks once per episode and surfaces a result when a newly discovered public record is relevant to the conversation.
 
 ## Origin
 
-The project began with a joke about connecting OpenAI Computer History to Flock Safety cameras. The functional version creates an ironic symmetry: Codex remembers the user's digital context while Flock Me can bring public records of institutional attention toward the user's vehicle into the conversation.
+The project began with a joke about connecting OpenAI Computer History to Flock Safety cameras. The functional version generalizes that ironic symmetry: an AI agent remembers the user's digital context while Flock Me brings public records of institutional attention toward the user's vehicle into the conversation.
 
 ## Product Positioning
 
 **Know when your household's vehicles have been searched through the Flock surveillance network.**
 
-Flock Me connects Codex directly to public, FOIA-derived Flock Safety audit records. The user enrolls household license plates once, and Codex can discover when a Flock user searched for one of those vehicles.
+Flock Me connects supported agent harnesses directly to public, FOIA-derived Flock Safety audit records. The user enrolls household license plates once, and the agent checks whether a Flock user searched for one of those vehicles.
 
 When records are available, Flock Me reveals the institutional trail: the searching agency, operator, date, stated reason, case number, search type, and network reach.
 
@@ -28,7 +28,7 @@ Each result answers a precise question:
 
 > Has someone using Flock searched for one of our vehicles?
 
-Flock Me turns scattered public surveillance records into persistent personal awareness inside Codex.
+Flock Me turns scattered public surveillance records into persistent personal awareness inside the agent the user already uses.
 
 **They built a network to search your movements. Flock Me gives you a window into who searched.**
 
@@ -65,17 +65,17 @@ Flock Me has exactly two activation paths:
 1. a new-session review of available recent history and memory for household travel;
 2. explicit invocation through Flock Me's enabled skill command.
 
-The first implementation packages the Flock Me skill with:
+Each harness implementation packages the Flock Me skill with:
 
-1. a `SessionStart` hook limited to a new session;
+1. the harness's documented new-session lifecycle hook or equivalent;
 2. a persistent state store containing the household registry, last evaluation checkpoint, and previously seen result identifiers;
-3. skill metadata with `allow_implicit_invocation: false`.
+3. the narrowest documented activation policy that preserves explicit use.
 
 The `SessionStart` hook adds compact developer context to the first ordinary model request. That context instructs the agent to review the context available since the last checkpoint, reason about whether household travel occurred, and invoke the skill when appropriate. This reuses a model turn that is already happening and avoids a continuously running inference process.
 
 Ordinary mid-session travel remarks do not activate the skill. All activation outside the new-session review is explicit.
 
-The hook receives a `transcript_path` when one is available. OpenAI documents that transcript format as unstable, so direct transcript parsing remains a constrained implementation detail. The preferred hook output is a short reasoning instruction for the agent rather than a second transcript-analysis subsystem.
+Lifecycle context and transcript access differ by harness. Direct transcript parsing remains a constrained implementation detail. The preferred hook output is a short reasoning instruction for the agent rather than a second transcript-analysis subsystem.
 
 ### Activation Levels
 
@@ -86,7 +86,7 @@ The hook receives a `transcript_path` when one is available. OpenAI documents th
 
 ## Vehicle Enrollment and Persistence
 
-License plate is the sole user-facing enrollment input. The skill maintains a persistent local registry so enrollment survives future Codex sessions. A household can enroll one or more vehicles.
+License plate is the sole user-facing enrollment input. The skill maintains a persistent local registry so enrollment survives future agent sessions. A household can enroll one or more vehicles.
 
 The enrollment flow is:
 
@@ -113,16 +113,16 @@ An optional local nickname such as `My car`, `Partner's car`, or `Work truck` ca
 
 When a mobility episode identifies a particular enrolled vehicle, the skill checks that vehicle. When the context establishes travel but leaves the vehicle ambiguous, the skill checks all enrolled household vehicles together. One mobility episode still produces at most one service request.
 
-Natural enrollment opportunities include user-provided registrations, insurance documents, parking or toll notices, traffic citations, repair invoices, or intentional vehicle photographs. Codex should identify the presence of a plate-like value and request permission before using it. Silent extraction or enrollment is outside the current design.
+Natural enrollment opportunities include user-provided registrations, insurance documents, parking or toll notices, traffic citations, repair invoices, or intentional vehicle photographs. The agent should identify the presence of a plate-like value and request permission before using it. Silent extraction or enrollment is outside the current design.
 
 ### Setup Entrypoints
 
 The skill supports two setup paths:
 
-1. **First post-install session:** The `SessionStart` hook finds an empty household registry and instructs the agent to offer Flock Me setup once.
-2. **Explicit setup command:** The user invokes `$flock-me` with a setup request at any time to enroll, list, rename, or remove household vehicles.
+1. **First post-install session:** The harness lifecycle hook finds an empty household registry and instructs the agent to offer Flock Me setup once.
+2. **Explicit setup command:** The user invokes Flock Me through the harness-specific command with a setup request to enroll, list, rename, or remove household vehicles.
 
-An interactive installer lifecycle is not established by the current OpenAI documentation. The first post-install session provides the installation-adjacent setup experience using a documented lifecycle hook.
+The first post-install session provides the installation-adjacent setup experience through the selected harness's lifecycle integration.
 
 ## Input Decision and Service Findings
 
@@ -150,7 +150,7 @@ Local Flock Me storage must retain the household vehicle registry and the smalle
 
 The eight-character identifier is a lookup token rather than a cryptographic privacy boundary. License-plate values occupy a small enough search space for enumeration, so the identifier remains sensitive local data.
 
-Persistent Codex memory behavior remains a separate design decision because a supported writable memory interface has not been confirmed.
+Persistent harness memory behavior remains a separate design decision because the supported writable interfaces differ across vendors.
 
 ## Design Invariants
 
@@ -176,15 +176,15 @@ Persistent Codex memory behavior remains a separate design decision because a su
 2. How does the source data handle identical plate strings registered in different jurisdictions?
 3. Does the service operator permit automated use of the internal endpoint?
 4. Is there a stable supported API or downloadable dataset suited to this use?
-5. Which Codex mechanism can persist the household vehicle registry and previously seen record identifiers across sessions?
+5. Which portable local mechanism should persist the household vehicle registry and previously seen record identifiers across harnesses?
 6. Can a skill write supported persistent memory, or should the project use repo-local state?
 7. What confidence threshold should open a mobility episode?
 8. What wording should the first post-install setup offer use?
 9. Which result conditions justify interrupting an unrelated conversation?
 10. What default labels should distinguish multiple vehicles without retaining raw plates?
-11. What context is available to a `SessionStart` hook across separate chats and projects?
+11. What context does each harness make available to its new-session lifecycle hook across separate chats and projects?
 12. How should the checkpoint record prevent repeated evaluation of the same context?
-13. How should each supported Codex surface present the explicit Flock Me command?
+13. How should each supported harness present and verify the explicit Flock Me invocation?
 
 ## Next Design Step
 
@@ -202,3 +202,6 @@ Choose the supported local persistence mechanism for the household vehicle regis
 - [OpenAI skill invocation and packaging](https://learn.chatgpt.com/docs/build-skills)
 - [OpenAI Codex lifecycle hooks](https://learn.chatgpt.com/docs/hooks)
 - [OpenAI scheduled tasks](https://learn.chatgpt.com/docs/automations)
+- [Anthropic Claude Code skills](https://code.claude.com/docs/en/slash-commands)
+- [xAI Grok Build skills](https://docs.x.ai/build/features/skills-plugins-marketplaces)
+- [Google Gemini CLI skills](https://geminicli.com/docs/cli/creating-skills/)

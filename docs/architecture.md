@@ -8,7 +8,7 @@ Flock Me connects an enrolled household vehicle registry to public Flock Safety 
 
 ```mermaid
 flowchart LR
-    A["New Codex session"] --> B["Session-start hook"]
+    A["New agent session"] --> B["Harness lifecycle hook"]
     B --> C["Travel reasoning"]
     D["Explicit Flock Me invocation"] --> E["Skill workflow"]
     C -->|"credible travel evidence"| E
@@ -32,7 +32,7 @@ The skill accepts only two entry points:
 1. a lifecycle instruction requesting the new-session travel review;
 2. an explicit Flock Me invocation.
 
-The skill does not activate from ordinary mid-session travel remarks. Its eventual `agents/openai.yaml` configuration disables normal implicit invocation.
+The skill does not activate from ordinary mid-session travel remarks. Each harness package uses the narrowest documented activation control that preserves explicit use. Gemini relies on a narrowly scoped description because it does not document a manual-only skill field.
 
 ### Session-start hook
 
@@ -65,7 +65,7 @@ These values prevent repeated evaluation, repeated requests for one mobility epi
 
 ## Automatic flow
 
-1. Start a new Codex session.
+1. Start a new agent session.
 2. Load the registry and last checkpoint.
 3. If no vehicles are enrolled, follow the one-time setup-offer policy.
 4. Review the available recent context since the checkpoint.

@@ -4,17 +4,17 @@
 
 **Know when your household's vehicles have been searched through the Flock surveillance network.**
 
-Flock Me connects Codex directly to public, FOIA-derived Flock Safety audit records. Enroll your household's license plates once, and Flock Me checks whether someone using Flock searched for one of those vehicles.
+Flock Me connects your AI agent directly to public, FOIA-derived Flock Safety audit records. Enroll your household's license plates once, and Flock Me checks whether someone using Flock searched for one of those vehicles.
 
 When records are available, Flock Me reveals the institutional trail: the searching agency, operator, date, stated reason, case number, search type, and network reach.
 
-The integration fits into the way you already use Codex. At the beginning of a new session, Flock Me reviews the available recent context for signs that someone in your household traveled and checks the enrolled vehicles. You can also invoke it directly whenever you want an immediate answer. There is no plate to re-enter, no separate website to visit, and no manual search to remember.
+The integration fits into the way you already use your agent. At the beginning of a new session, Flock Me reviews the available recent context for signs that someone in your household traveled and checks the enrolled vehicles. You can also invoke it directly whenever you want an immediate answer. There is no plate to re-enter, no separate website to visit, and no manual search to remember.
 
 Each result answers one precise question:
 
 > Has someone using Flock searched for one of our vehicles?
 
-Flock Me turns scattered public surveillance records into persistent personal awareness inside Codex.
+Flock Me turns scattered public surveillance records into persistent personal awareness inside the agent you already use.
 
 **They built a network to search your movements. Flock Me gives you a window into who searched.**
 
@@ -24,16 +24,27 @@ Flock Me turns scattered public surveillance records into persistent personal aw
 
 ### Status
 
-Flock Me is in design and scaffolding. The skill behavior and packaging metadata have first drafts. The lifecycle hook, persistent state store, plate normalization implementation, service adapter, and tests do not exist yet. The project is not installed or operational.
+Flock Me is in design and scaffolding. Harness-specific skill packages exist for Codex, Claude Code, Grok Build, and Gemini CLI. The lifecycle hooks, persistent state store, plate normalization implementation, service adapter, and tests do not exist yet. The project is not operational.
+
+### Supported harnesses
+
+| Harness | Skill package | Explicit use |
+| --- | --- | --- |
+| Codex | [`skills/codex/flock-me/`](skills/codex/flock-me/) | `$flock-me` |
+| Claude Code | [`skills/claude/flock-me/`](skills/claude/flock-me/) | `/flock-me` |
+| Grok Build | [`skills/grok-build/flock-me/`](skills/grok-build/flock-me/) | `/flock-me` |
+| Gemini CLI | [`skills/gemini/flock-me/`](skills/gemini/flock-me/) | Ask Gemini to use Flock Me and approve activation |
+
+To install the draft, point a supported agent at this repository and ask it to install Flock Me for its harness. [`AGENTS.md`](AGENTS.md) provides the exact source, target, and verification rules. It also prevents the installer from claiming that the unimplemented lookup and session-start components work.
 
 ### Activation contract
 
 Flock Me has exactly two entry points:
 
 1. **New-session review:** Review the recent history and memory available from the host for signs that the user or another household member traveled. Check the relevant enrolled vehicle, or all enrolled vehicles when the context is ambiguous.
-2. **Explicit invocation:** Run Flock Me directly through `$flock-me` or its enabled skill command entry. An explicit check does not require evidence of travel.
+2. **Explicit invocation:** Run Flock Me through the harness-specific invocation shown above. An explicit check does not require evidence of travel.
 
-Ordinary mid-session travel remarks do not activate the skill. Skill metadata sets `allow_implicit_invocation: false`.
+Ordinary mid-session travel remarks do not activate the skill. Codex, Claude Code, and Grok Build packages use their documented manual-only activation controls. Gemini lacks a documented manual-only skill field, so its description narrowly limits activation to an explicit Flock Me request or trusted lifecycle context.
 
 ### Vehicle enrollment and privacy
 
@@ -56,11 +67,12 @@ The public dataset is incomplete and delayed because it is assembled from public
 
 ### Repository layout
 
-- [`SKILL.md`](SKILL.md) defines the agent behavior.
-- [`agents/openai.yaml`](agents/openai.yaml) defines the Codex skill-list metadata and requires explicit invocation.
+- [`skills/`](skills/) contains the Codex, Claude Code, Grok Build, and Gemini CLI packages.
+- [`AGENTS.md`](AGENTS.md) routes installation requests to the correct harness package.
 - [`docs/design.md`](docs/design.md) preserves the evolving product requirements and research notes.
 - [`docs/architecture.md`](docs/architecture.md) defines the component boundaries and execution flows.
 - [`docs/decisions.md`](docs/decisions.md) records accepted design decisions.
+- [`docs/harness-skill-specifications.md`](docs/harness-skill-specifications.md) records the official vendor formats and portability decisions.
 - [`assets/hero.png`](assets/hero.png) is the selected project banner.
 - [`assets/hero-candidates/`](assets/hero-candidates/) preserves the original banner explorations.
 
