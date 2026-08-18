@@ -15,7 +15,7 @@ Flock Me therefore **must not** call `haveibeenflocked.com`. The production adap
 
 ## Observed internal interface (not to be used)
 
-Frontend search, observed 2026-08-18:
+Frontend search, observed 2026-08-17/18:
 
 ```
 POST /api/search/text
@@ -29,6 +29,7 @@ Content-Type: application/json
 - HTTP 429: rate limited. Body text is shown to the user.
 - HTTP 404: treated as an empty result set.
 - HTTP 200 with `results: []`: no match in the available public dataset.
+- Other errors: `{ error: string }`.
 
 Result columns used by the site include search time, searching agency, operator, identifier, devices searched, networks searched, reason, case number, search type, text prompt, and redaction markers.
 
@@ -44,6 +45,6 @@ Result columns used by the site include search time, searching agency, operator,
 | Adapter | Role |
 | --- | --- |
 | `UnavailableAdapter` | Production. Throws `SERVICE_UNAVAILABLE`. |
-| `FixtureAdapter` | Tests. Parses matches, empty sets, redactions, and malformed payloads. |
+| `FixtureAdapter` | Tests and rehearsal. Parses matches, empty sets, redactions, and malformed payloads. |
 
 A live adapter may be added only after written permission, a documented public API, or a downloadable dataset with a stable schema.

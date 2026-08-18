@@ -1,6 +1,6 @@
 # Roadmap
 
-Flock Me currently has product requirements, architecture boundaries, harness-specific skill packages, installation routing, project documentation, and a TypeScript runtime for plate normalization, household enrollment, state, and an explicit-fail service adapter. Live Have I Been Flocked lookups remain unavailable until a permitted contract exists.
+Flock Me currently has product requirements, architecture boundaries, harness-specific skill packages, installation routing, project documentation, a TypeScript runtime, and a dependency-free ESM runtime for plate normalization, household enrollment, state, and an explicit-fail service adapter. Live Have I Been Flocked lookups remain unavailable until a permitted contract exists.
 
 ## Critical path
 
@@ -62,7 +62,7 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 - [ ] Test session checkpoints and repeated-session behavior.
 - [ ] Add harness-specific discovery and invocation tests.
 - [ ] Add complete end-to-end tests using non-sensitive test plates.
-- [ ] Verify that every result preserves the exact audit-record meaning and dataset limitations.
+- [x] ~~Verify that every result preserves the exact audit-record meaning and dataset limitations.~~
 
 ## Packaging and installation
 
@@ -90,4 +90,4 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 
 ## Recommended next milestone
 
-Wire explicit check behavior through each harness to the new runtime. Session-start hooks remain blocked on host-specific lifecycle research. Live lookups remain blocked on a permitted Have I Been Flocked contract.
+Wire explicit check behavior through each harness to the runtime. Session-start hooks remain blocked on host-specific lifecycle research. Live lookups remain blocked on a permitted Have I Been Flocked contract.
