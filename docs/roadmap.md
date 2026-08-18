@@ -1,31 +1,31 @@
 # Roadmap
 
-Flock Me currently has product requirements, architecture boundaries, harness-specific skill packages, installation routing, and project documentation. The runtime integration is not operational.
+Flock Me currently has product requirements, architecture boundaries, harness-specific skill packages, installation routing, and project documentation. The live Have I Been Flocked integration is not operational. The shared runtime, household registry, and observed service contract now exist.
 
 ## Critical path
 
 - [ ] Confirm whether Have I Been Flocked permits automated access.
 - [ ] Identify a supported API, downloadable dataset, or obtain permission to use the observed internal endpoint.
-- [ ] Verify the exact plate-normalization algorithm with deterministic test vectors.
-- [ ] Determine how identical plate strings from different jurisdictions are handled.
-- [ ] Establish request limits, batching limits, and the response schema.
-- [ ] Choose the shared implementation runtime.
-- [ ] Choose the portable persistent-state location and format.
-- [ ] Decide whether derived plate identifiers require encryption or restrictive file permissions.
+- [x] ~~Verify the exact plate-normalization algorithm with deterministic test vectors.~~
+- [x] ~~Determine how identical plate strings from different jurisdictions are handled.~~
+- [x] ~~Establish request limits, batching limits, and the response schema.~~
+- [x] ~~Choose the shared implementation runtime.~~
+- [x] ~~Choose the portable persistent-state location and format.~~
+- [x] ~~Decide whether derived plate identifiers require encryption or restrictive file permissions.~~
 
 ## Core implementation
 
-- [ ] Implement deterministic plate normalization and identifier derivation.
-- [ ] Implement household vehicle enrollment.
-- [ ] Implement multiple-vehicle labels and duplicate detection.
-- [ ] Implement list, add, rename, remove, and clear operations.
-- [ ] Implement the Have I Been Flocked service adapter.
-- [ ] Define stable audit-record identifiers for deduplication.
-- [ ] Implement previously seen result tracking.
-- [ ] Implement atomic state writes and protect against concurrent harness sessions.
+- [x] ~~Implement deterministic plate normalization and identifier derivation.~~
+- [x] ~~Implement household vehicle enrollment.~~
+- [x] ~~Implement multiple-vehicle labels and duplicate detection.~~
+- [x] ~~Implement list, add, rename, remove, and clear operations.~~
+- [x] ~~Implement the Have I Been Flocked service adapter.~~
+- [x] ~~Define stable audit-record identifiers for deduplication.~~
+- [x] ~~Implement previously seen result tracking.~~
+- [x] ~~Implement atomic state writes and protect against concurrent harness sessions.~~
 - [ ] Implement explicit check behavior for every harness.
-- [ ] Handle unavailable services, malformed responses, and missing state explicitly.
-- [ ] Ensure raw license plates never enter logs or persistent storage.
+- [x] ~~Handle unavailable services, malformed responses, and missing state explicitly.~~
+- [x] ~~Ensure raw license plates never enter logs or persistent storage.~~
 
 ## Session-start behavior
 
@@ -43,26 +43,26 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 
 ## Onboarding and privacy
 
-- [ ] Write the first-session setup offer.
-- [ ] Define explicit enrollment-consent language.
-- [ ] Define default vehicle labels.
-- [ ] Provide a way to inspect and delete all locally stored Flock Me data.
-- [ ] Write the local-data and threat-model document.
-- [ ] Establish secure file permissions and log-redaction rules.
-- [ ] Decide whether setup remains available before the service integration is operational.
+- [x] ~~Write the first-session setup offer.~~
+- [x] ~~Define explicit enrollment-consent language.~~
+- [x] ~~Define default vehicle labels.~~
+- [x] ~~Provide a way to inspect and delete all locally stored Flock Me data.~~
+- [x] ~~Write the local-data and threat-model document.~~
+- [x] ~~Establish secure file permissions and log-redaction rules.~~
+- [x] ~~Decide whether setup remains available before the service integration is operational.~~
 
 ## Testing
 
-- [ ] Add normalization and hashing test vectors.
-- [ ] Add registry and state-migration tests.
-- [ ] Add adapter fixtures for matches, no matches, redactions, and malformed records.
-- [ ] Test multiple-vehicle batching.
-- [ ] Test audit-record deduplication.
+- [x] ~~Add normalization and hashing test vectors.~~
+- [x] ~~Add registry and state-migration tests.~~
+- [x] ~~Add adapter fixtures for matches, no matches, redactions, and malformed records.~~
+- [x] ~~Test multiple-vehicle batching.~~
+- [x] ~~Test audit-record deduplication.~~
 - [ ] Create travel-context fixtures covering direct, indirect, ambiguous, and absent travel.
 - [ ] Test session checkpoints and repeated-session behavior.
 - [ ] Add harness-specific discovery and invocation tests.
 - [ ] Add complete end-to-end tests using non-sensitive test plates.
-- [ ] Verify that every result preserves the exact audit-record meaning and dataset limitations.
+- [x] ~~Verify that every result preserves the exact audit-record meaning and dataset limitations.~~
 
 ## Packaging and installation
 
@@ -81,7 +81,7 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 - [ ] Document every command and expected result.
 - [ ] Add a security and privacy section to the README.
 - [ ] Add troubleshooting instructions.
-- [ ] Choose an open-source license and add `LICENSE`.
+- [x] ~~Choose an open-source license and add `LICENSE`.~~
 - [ ] Add contribution guidance when outside contributions are desired.
 - [ ] Add continuous integration for validation and cross-package consistency.
 - [ ] Create the release checklist and versioning policy.
@@ -90,4 +90,4 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 
 ## Recommended next milestone
 
-Resolve the service integration contract and plate-normalization algorithm together. Every operational workflow depends on knowing how a plate becomes a valid, permitted lookup.
+Confirm whether Have I Been Flocked permits automated use of `POST /api/search/text`. Normalization, persistence, enrollment, and the fixture adapter are in `runtime/`. Live lookups stay off until that permission exists.
