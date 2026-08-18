@@ -6,7 +6,7 @@
 
 ## Strongest Current Concept
 
-Flock Me is a satirical, functional Codex skill that recognizes evidence of a user's movement outside the home and checks public, FOIA-derived Flock Safety audit records for an enrolled vehicle.
+Flock Me is a satirical, functional Codex skill that recognizes evidence of a user's movement outside the home and checks public, FOIA-derived Flock Safety audit records for the user's enrolled household vehicles.
 
 The skill treats movement as a bounded mobility episode. It checks once per episode and surfaces a result when a newly discovered public record is relevant to the conversation.
 
@@ -45,39 +45,42 @@ Related signals contribute to one mobility episode. They do not cause repeated l
 3. **Confirmed outing:** An explicit travel statement or direct travel artifact. Open the mobility episode.
 4. **Relevant finding:** A previously unseen audit record overlaps with or is otherwise relevant to the episode. Surface the record with exact limits.
 
-## Vehicle Enrollment Direction
+## Vehicle Enrollment and Persistence
 
-The user's plate serves as a one-time enrollment value rather than a conversational trigger.
+License plate is the sole user-facing enrollment input. The skill maintains a persistent local registry so enrollment survives future Codex sessions. A household can enroll one or more vehicles.
 
-The preferred flow is:
+The enrollment flow is:
 
 1. Ask for explicit permission to enable vehicle audit checks.
-2. Receive the plate once.
+2. Receive one license plate.
 3. Normalize it locally.
 4. Compute the first eight hexadecimal characters of its SHA-256 hash.
-5. Retain the derived identifier.
+5. Add the derived identifier as one vehicle in the persistent registry.
 6. Discard the raw plate.
-7. Use the identifier for future checks.
+7. Offer enrollment of another household vehicle.
+8. Use the registry for future checks without requesting the plate again.
 
-The site also accepts an existing eight-character identifier copied by the user.
+The registry stores one entry per vehicle. The derived identifier is the lookup key and the uniqueness key. Re-enrolling the same normalized plate leaves one registry entry.
+
+The minimum registry operations are:
+
+- enroll a vehicle from a license plate;
+- recognize an already-enrolled vehicle;
+- list enrolled vehicles using non-sensitive local labels;
+- remove a vehicle that was sold, returned, or entered incorrectly;
+- clear the entire household registry.
+
+An optional local nickname such as `My car`, `Partner's car`, or `Work truck` can make multiple entries understandable. The nickname has no role in the web-service query.
+
+When a mobility episode identifies a particular enrolled vehicle, the skill checks that vehicle. When the context establishes travel but leaves the vehicle ambiguous, the skill checks all enrolled household vehicles together. One mobility episode still produces at most one service request.
 
 Natural enrollment opportunities include user-provided registrations, insurance documents, parking or toll notices, traffic citations, repair invoices, or intentional vehicle photographs. Codex should identify the presence of a plate-like value and request permission before using it. Silent extraction or enrollment is outside the current design.
 
-## Current Input Findings
+## Input Decision and Service Findings
 
-The plate or its derived identifier is the reliable key for finding records associated with a user's vehicle.
+The product accepts license plate as its only lookup enrollment input. Names, addresses, vehicle descriptions, agencies, operators, reasons, and case numbers do not identify the user's vehicle reliably.
 
-| Candidate | Site capability | Personal vehicle identification |
-| --- | --- | --- |
-| License plate | Homepage lookup | Reliable lookup key |
-| Eight-character plate identifier | Homepage and internal search endpoint | Reliable lookup key |
-| User name | General text search can match operator names or incidental text | Insufficient |
-| Street address | Sensitive addresses are redacted when detected | Insufficient |
-| Vehicle make, model, or color | Can appear in FreeForm-related text | Insufficient |
-| Agency or operator | Searchable audit metadata | Describes the searching party |
-| Case number or reason | Searchable audit metadata | Investigative context after discovery |
-
-The public Reason Search covers reason, case number, operator name, license plate, and text-prompt fields. Operator names identify people performing Flock searches. Civilian names and vehicle descriptions can occur incidentally and do not reliably resolve a user's vehicle.
+The public Reason Search covers reason, case number, operator name, license plate, and text-prompt fields. Those fields support investigation after a plate match. Operator names identify people performing Flock searches. Civilian names and vehicle descriptions can occur incidentally.
 
 ## Observed Service Interface
 
@@ -95,13 +98,20 @@ The internal endpoint is an observed implementation detail and may change. A sta
 
 Have I Been Flocked states that it does not log search terms or perform third-party lookups. Its server retains 24 hours of application logs containing hashed or partial IP addresses, sanitized slow-query logs, and a hash of browser user-agent plus IP for visitor analytics. Security incidents can produce longer retention.
 
-Local Flock Me storage should retain the derived vehicle identifier and the smallest practical result state. Persistent Codex memory behavior remains a separate design decision because a supported writable memory interface has not been confirmed.
+Local Flock Me storage must retain the household vehicle registry and the smallest practical result state across sessions. Each registry entry contains the derived identifier and optional local nickname. The raw plate leaves working state after derivation.
+
+The eight-character identifier is a lookup token rather than a cryptographic privacy boundary. License-plate values occupy a small enough search space for enumeration, so the identifier remains sensitive local data.
+
+Persistent Codex memory behavior remains a separate design decision because a supported writable memory interface has not been confirmed.
 
 ## Design Invariants
 
 - Explicit enrollment authorizes use of a vehicle identifier.
+- Enrollment accepts license plate as the sole lookup identity.
+- The local registry supports multiple household vehicles across sessions.
+- Each normalized plate maps to one registry entry.
 - Mobility context activates relevance assessment.
-- One bounded mobility episode produces at most one lookup.
+- One bounded mobility episode produces at most one service request, containing one or more enrolled identifiers.
 - A result states exactly that an operator searched the plate.
 - Every surfaced result includes the dataset's incompleteness and delay where relevant.
 - Previously seen records remain distinguishable from newly discovered records.
@@ -113,15 +123,16 @@ Local Flock Me storage should retain the derived vehicle identifier and the smal
 2. How does the source data handle identical plate strings registered in different jurisdictions?
 3. Does the service operator permit automated use of the internal endpoint?
 4. Is there a stable supported API or downloadable dataset suited to this use?
-5. Which Codex mechanism can hold local enrollment and previously seen record identifiers?
+5. Which Codex mechanism can persist the household vehicle registry and previously seen record identifiers across sessions?
 6. Can a skill write supported persistent memory, or should the project use repo-local state?
 7. What confidence threshold should open a mobility episode?
 8. Should the first mobility trigger offer enrollment, or should installation include a dedicated setup exchange?
 9. Which result conditions justify interrupting an unrelated conversation?
+10. What default labels should distinguish multiple vehicles without retaining raw plates?
 
 ## Next Design Step
 
-Design the one-time enrollment conversation around the verified identifier requirement. Then define the mobility episode state and the exact conditions for offering a check, performing a check, and surfacing a result.
+Choose the supported local persistence mechanism for the household vehicle registry. Then design the one-time enrollment conversation and define the mobility episode state and the exact conditions for offering a check, performing a check, and surfacing a result.
 
 ## Primary Sources
 
