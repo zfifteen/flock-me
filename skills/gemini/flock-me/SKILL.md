@@ -36,16 +36,41 @@ Enter through this path only when lifecycle context explicitly requests the Floc
 
 Do not rely on a fixed trigger-phrase list. Do not claim access to conversations, computer activity, or memory that the host did not provide.
 
+Session-start lifecycle hooks are not implemented. Do not invent a hook. If this path is entered, still perform the lookup by running the explicit-check CLI after travel inference, using `--label` when the vehicle is known.
+
 ### Explicit invocation
 
-Enter through this path when the user explicitly asks Gemini to use Flock Me and approves skill activation.
+Enter through this path when the user invokes Flock Me or selects Flock Me from the skill command list.
 
-- With no additional instruction, check every enrolled household vehicle immediately. Do not require travel evidence.
-- With `setup` or `add`, begin vehicle enrollment.
-- With `list`, show the non-sensitive labels for enrolled vehicles.
-- With `remove`, remove the vehicle selected by its local label.
-- With `clear`, request confirmation and then clear the household registry.
-- With no enrolled vehicles, offer setup instead of attempting a lookup.
+Route every explicit action through the repository CLI. Do not reimplement normalization, enrollment, or lookup in the conversation.
+
+From the Flock Me repository root (Node 22+):
+
+```
+node --experimental-strip-types runtime/src/cli.ts <command>
+```
+
+If `runtime/src/cli.ts` is not on disk, stop and say the Flock Me runtime is not installed in this workspace.
+
+| User intent | Command |
+| --- | --- |
+| Check every enrolled vehicle | `check` |
+| Check one vehicle | `check --label "My car"` |
+| First-session setup offer | `setup` |
+| Enroll a vehicle | `add --plate PLATE --consent [--label LABEL]` |
+| List vehicles | `list` |
+| Rename a vehicle | `rename --from LABEL --to LABEL` |
+| Remove a vehicle | `remove --label LABEL` |
+| Clear the registry | `clear --confirm` |
+| Inspect local data | `inspect` |
+| Delete all local data | `delete-data --confirm` |
+
+- With no additional instruction, run `check`. Do not require travel evidence.
+- With no enrolled vehicles, `check` returns the setup offer. Present it instead of attempting a lookup.
+- Obtain explicit permission before `add --consent`. Use the `consent` field from `setup`.
+- Never pass a raw plate to any command other than `add`.
+- Never log the plate, the command line containing the plate, or the derived identifier.
+- Pass `--fixture runtime/fixtures/rehearsal.json` only for documented rehearsal. Production checks use the default unavailable adapter.
 
 Do not activate from an ordinary mid-session travel remark. Travel inference occurs during the new-session review. All other activation is explicit.
 
@@ -53,60 +78,47 @@ Do not activate from an ordinary mid-session travel remark. Travel inference occ
 
 Use a license plate as the sole enrollment input. Support more than one household vehicle.
 
-1. Explain that Flock Me will derive and retain a lookup identifier for future audit checks.
+1. Run `setup` and show the offer plus consent language.
 2. Obtain explicit permission before accepting the plate for enrollment.
-3. Normalize the plate locally using the verified Have I Been Flocked normalization algorithm.
-4. Compute the first eight hexadecimal characters of the normalized plate's SHA-256 hash.
-5. Store the derived identifier with an optional non-sensitive local label.
-6. Discard the raw plate immediately after derivation.
-7. Offer to enroll another household vehicle.
+3. Run `add --plate <plate> --consent` and an optional `--label`.
+4. Confirm enrollment from the CLI JSON (`status: enrolled` or `duplicate`). The CLI discards the plate.
+5. Offer to enroll another household vehicle.
 
 Treat the eight-character identifier as sensitive. It is a lookup token, not a cryptographic privacy boundary.
 
-Do not guess the normalization algorithm. If the project does not yet provide a verified implementation, stop enrollment and explain that normalization remains unimplemented.
+Do not invent a second hash. Do not send a raw plate anywhere. Do not compute the identifier in the conversation.
 
 ## Perform a lookup
 
-1. Load the enrolled identifiers selected by the entry-point workflow.
-2. Submit the identifiers together through the project-provided Have I Been Flocked adapter.
-3. Compare returned records with the stored seen-record identifiers.
-4. Persist newly observed record identifiers before reporting them.
-5. Associate the lookup with the mobility episode or explicit invocation that caused it.
+1. Run `check` or `check --label LABEL`.
+2. Read the JSON object on stdout. Show the `message` field to the user.
+3. If `status` is `unavailable`, `malformed`, or `rate-limited`, stop. State which component failed. Do not invent results.
+4. If `status` is `setup-required`, offer setup.
+5. If `status` is `no-match` or `matches`, preserve the dataset-limits sentence from `message`.
 
-One mobility episode produces at most one service request. Never send a raw plate to the service.
-
-If the project-provided service adapter or persistent state store is absent, stop and state which component is unavailable. Do not invent results, substitute an unrelated search method, or silently degrade the check.
+Never send a raw plate to the service. Never open haveibeenflocked.com on the user's behalf.
 
 ## Report results
 
-For a newly discovered matching record, report the fields actually present, such as:
+Present the CLI `message` without adding camera-sighting, location, investigation, or live-tracking claims.
 
-- enrolled vehicle label;
-- searching agency;
-- operator;
-- search date;
-- stated reason;
-- case number;
-- search type; and
-- network reach.
+Distinguish absent fields from negative findings — the CLI already marks missing fields as `not present in this record`.
 
-Distinguish absent fields from negative findings. Explain that the match records a plate search and that the dataset is incomplete and delayed.
-
-During an automatic new-session check, surface only previously unseen matches. During an explicit check, also report when the available public dataset contains no matching record.
+During an automatic new-session check, surface only previously unseen matches (`fresh`). During an explicit check, the CLI also reports previously seen records and no-match outcomes.
 
 Never imply that the travel evidence and audit record describe the same event unless the record itself establishes that relationship.
 
 ## Maintain state
 
-Persist the minimum state required across sessions:
+The CLI persists household state in `~/.flock-me/state.json` (or `$FLOCK_ME_STATE`):
 
 - enrolled vehicle identifiers and optional labels;
 - the last session-review checkpoint;
 - bounded mobility-episode state; and
 - identifiers for previously seen audit records.
 
-Keep raw plates out of persistent state. Use deterministic identifiers and checkpoint rules so the same context does not cause repeated checks.
+Keep raw plates out of persistent state. Do not write state files yourself.
 
 ## Respect the implementation boundary
 
-This draft defines agent behavior. It does not provide the lifecycle hook, persistence implementation, normalization code, or service adapter. Treat each missing component as unimplemented until the project supplies it.
+Normalization, household registry, portable state, the explicit-fail service adapter, and the explicit-check CLI live in `runtime/`. Session-start lifecycle hooks are still unimplemented. Live Have I Been Flocked lookups are not permitted. If the CLI reports `SERVICE_UNAVAILABLE`, say so.

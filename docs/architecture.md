@@ -47,7 +47,7 @@ The registry persists one entry per vehicle:
 - an eight-character derived lookup identifier;
 - an optional non-sensitive local label.
 
-Raw license plates do not enter persistent state. The storage mechanism remains undecided.
+Raw license plates do not enter persistent state. Portable state is versioned JSON at `~/.flock-me/state.json` or `$FLOCK_ME_STATE`.
 
 ### Service adapter
 
@@ -78,7 +78,7 @@ These values prevent repeated evaluation, repeated requests for one mobility epi
 ## Explicit flow
 
 1. Receive the explicit Flock Me invocation.
-2. Route setup and registry-management requests directly.
+2. Run `runtime/src/cli.ts` for setup, registry management, or `check`.
 3. For a check with no additional instruction, select all enrolled vehicles.
 4. Submit one batched lookup without requiring travel evidence.
 5. Report matching records or state that the available public dataset contains no match.

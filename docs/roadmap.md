@@ -1,6 +1,6 @@
 # Roadmap
 
-Flock Me currently has product requirements, architecture boundaries, harness-specific skill packages, installation routing, project documentation, a TypeScript runtime, and a dependency-free ESM runtime for plate normalization, household enrollment, state, and an explicit-fail service adapter. Live Have I Been Flocked lookups remain unavailable until a permitted contract exists.
+Flock Me currently has product requirements, architecture boundaries, harness-specific skill packages, installation routing, project documentation, a TypeScript runtime, a dependency-free ESM runtime for plate normalization, household enrollment, state, and an explicit-fail service adapter, and an explicit-check CLI wired through every harness. Live Have I Been Flocked lookups remain unavailable until a permitted contract exists.
 
 ## Critical path
 
@@ -23,7 +23,7 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 - [x] ~~Define stable audit-record identifiers for deduplication.~~
 - [x] ~~Implement previously seen result tracking.~~
 - [x] ~~Implement atomic state writes and protect against concurrent harness sessions.~~
-- [ ] Implement explicit check behavior for every harness.
+- [x] ~~Implement explicit check behavior for every harness.~~
 - [x] ~~Handle unavailable services, malformed responses, and missing state explicitly.~~
 - [x] ~~Ensure raw license plates never enter logs or persistent storage.~~
 
@@ -67,7 +67,7 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 ## Packaging and installation
 
 - [ ] Extend `AGENTS.md` to install hooks and runtime components after they exist.
-- [ ] Add a synchronization check so the four `SKILL.md` behavior sections cannot drift.
+- [x] ~~Add a synchronization check so the four `SKILL.md` behavior sections cannot drift.~~
 - [ ] Add harness-specific hook configuration packages.
 - [ ] Test user-level and project-level installation for every harness.
 - [ ] Define uninstall and upgrade behavior.
@@ -78,16 +78,16 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 
 - [ ] Replace draft installation language after the integration works.
 - [ ] Add setup and usage examples.
-- [ ] Document every command and expected result.
+- [x] ~~Document every command and expected result.~~
 - [ ] Add a security and privacy section to the README.
 - [ ] Add troubleshooting instructions.
 - [x] ~~Choose an open-source license and add `LICENSE`.~~
 - [ ] Add contribution guidance when outside contributions are desired.
-- [ ] Add continuous integration for validation and cross-package consistency.
+- [x] ~~Add continuous integration for validation and cross-package consistency.~~
 - [ ] Create the release checklist and versioning policy.
 - [ ] Perform a clean-machine installation test.
 - [ ] Publish and tag the first operational release.
 
 ## Recommended next milestone
 
-Wire explicit check behavior through each harness to the runtime. Session-start hooks remain blocked on host-specific lifecycle research. Live lookups remain blocked on a permitted Have I Been Flocked contract.
+Research lifecycle-hook specifications for Codex, Claude Code, Grok Build, and Gemini CLI. Explicit checks are wired through the runtime CLI. Live lookups remain blocked on a permitted Have I Been Flocked contract.

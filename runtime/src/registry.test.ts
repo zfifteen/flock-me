@@ -8,7 +8,10 @@ import {
   enrollVehicle,
   listVehicles,
   removeVehicle,
+  removeVehicleByLabel,
   renameVehicle,
+  renameVehicleByLabel,
+  requireVehicleByLabel,
 } from "./registry.ts";
 import { parseState } from "./state.ts";
 import { emptyState, type AuditRecord } from "./types.ts";
@@ -55,6 +58,26 @@ describe("household registry", () => {
     state = clearRegistry(state);
     assert.equal(state.vehicles.length, 0);
     assert.equal(state.seenRecords.length, 0);
+  });
+
+  it("selects, renames, and removes vehicles by label", () => {
+    let state = emptyState();
+    state = enrollVehicle(state, {
+      plate: "TESTPLATE",
+      consented: true,
+      now: NOW,
+    }).state;
+    state = enrollVehicle(state, {
+      plate: "ABC-123",
+      consented: true,
+      now: NOW,
+    }).state;
+    assert.equal(requireVehicleByLabel(state, "my car").derivedId, "d2097ce6");
+    state = renameVehicleByLabel(state, "My car", "Work truck");
+    assert.equal(state.vehicles[0]?.label, "Work truck");
+    state = removeVehicleByLabel(state, "Partner's car");
+    assert.equal(state.vehicles.length, 1);
+    assert.throws(() => requireVehicleByLabel(state, "Partner's car"), /No enrolled vehicle/);
   });
 
   it("refuses enrollment without consent", () => {

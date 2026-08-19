@@ -25,3 +25,5 @@ This record contains accepted product and architecture decisions. Open questions
 | 2026-08-18 | Keep live HIBF HTTP off; fail explicitly or use fixtures. | Production is `UnavailableAdapter`. Tests and rehearsal use `FixtureAdapter`. No degraded fallback search. |
 | 2026-08-18 | Keep setup available before live lookups work. | Enrollment, inspection, and deletion are useful without a service contract. |
 | 2026-08-18 | Default labels are `My car`, `Partner's car`, `Work truck`, then `Household van`. | Non-sensitive local nicknames that distinguish household vehicles without retaining plates. |
+| 2026-08-19 | Explicit checks go through `runtime/src/cli.ts` for every harness. | Skills must not reimplement lookup. Production adapter remains `UnavailableAdapter`. `--fixture` is rehearsal-only. |
+| 2026-08-19 | Keep one `skills/behavior.md` and fail CI if a `SKILL.md` body drifts. | Vendor differences belong in frontmatter and the `{{INVOKE}}` token. `scripts/check-skill-sync.mjs` is the synchronization check. |

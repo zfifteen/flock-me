@@ -24,7 +24,8 @@ Flock Me turns scattered public surveillance records into persistent personal aw
 
 ### Status
 
-Flock Me is in design and scaffolding. Harness-specific skill packages exist for Codex, Claude Code, Grok Build, and Gemini CLI. The lifecycle hooks, persistent state store, plate normalization implementation, service adapter, and tests do not exist yet. The project is not operational.
+Flock Me is not operational for live lookups. Harness-specific skill packages exist for Codex, Claude Code, Grok Build, and Gemini CLI. The TypeScript runtime implements plate normalization, household enrollment, portable state, an explicit-fail service adapter, and an explicit-check CLI wired through every harness. Session-start lifecycle hooks are not implemented. Have I Been Flocked does not permit automated access.
+
 
 ### Supported harnesses
 
@@ -35,7 +36,8 @@ Flock Me is in design and scaffolding. Harness-specific skill packages exist for
 | Grok Build | [`skills/grok-build/flock-me/`](skills/grok-build/flock-me/) | `/flock-me` |
 | Gemini CLI | [`skills/gemini/flock-me/`](skills/gemini/flock-me/) | Ask Gemini to use Flock Me and approve activation |
 
-To install the draft, point a supported agent at this repository and ask it to install Flock Me for its harness. [`AGENTS.md`](AGENTS.md) provides the exact source, target, and verification rules. It also prevents the installer from claiming that the unimplemented lookup and session-start components work.
+To install the draft, point a supported agent at this repository and ask it to install Flock Me for its harness. [`AGENTS.md`](AGENTS.md) provides the exact source, target, and verification rules. Explicit checks run through [`runtime/src/cli.ts`](runtime/src/cli.ts). Commands are documented in [`docs/commands.md`](docs/commands.md). Do not claim that automatic new-session review or live record lookup works.
+
 
 ### Activation contract
 
@@ -50,12 +52,13 @@ Ordinary mid-session travel remarks do not activate the skill. Codex, Claude Cod
 
 License plate is the sole enrollment input. A household can enroll multiple vehicles.
 
-For each plate, the planned implementation will:
+For each plate, the runtime will:
 
 1. normalize the plate locally using the verified service algorithm;
 2. derive the first eight hexadecimal characters of its SHA-256 hash;
 3. persist the derived identifier with an optional local vehicle label;
 4. discard the raw plate immediately.
+
 
 The shortened identifier remains sensitive because it is a lookup token rather than a cryptographic privacy boundary.
 
@@ -68,7 +71,10 @@ The public dataset is incomplete and delayed because it is assembled from public
 ### Repository layout
 
 - [`skills/`](skills/) contains the Codex, Claude Code, Grok Build, and Gemini CLI packages.
+- [`skills/behavior.md`](skills/behavior.md) is the shared skill behavior contract.
+- [`runtime/`](runtime/) contains the TypeScript CLI, ESM modules, and tests.
 - [`AGENTS.md`](AGENTS.md) routes installation requests to the correct harness package.
+- [`docs/commands.md`](docs/commands.md) documents every CLI command and expected result.
 - [`docs/design.md`](docs/design.md) preserves the evolving product requirements and research notes.
 - [`docs/architecture.md`](docs/architecture.md) defines the component boundaries and execution flows.
 - [`docs/decisions.md`](docs/decisions.md) records accepted design decisions.
@@ -76,8 +82,6 @@ The public dataset is incomplete and delayed because it is assembled from public
 - [`docs/roadmap.md`](docs/roadmap.md) tracks the remaining research, implementation, testing, and release work.
 - [`assets/hero.png`](assets/hero.png) is the selected project banner.
 - [`assets/hero-candidates/`](assets/hero-candidates/) preserves the original banner explorations.
-
-Implementation directories will be added when the runtime language and supported service interface are chosen. This keeps the current repository free of placeholder code and speculative abstractions.
 
 ### Implementation sequence
 

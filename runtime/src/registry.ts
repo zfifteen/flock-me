@@ -20,6 +20,7 @@ export class RegistryError extends Error {
     | "NOT_FOUND"
     | "EMPTY"
     | "INVALID_LABEL"
+    | "AMBIGUOUS_LABEL"
     | "MISSING_STATE";
 
   constructor(
@@ -28,6 +29,7 @@ export class RegistryError extends Error {
       | "NOT_FOUND"
       | "EMPTY"
       | "INVALID_LABEL"
+      | "AMBIGUOUS_LABEL"
       | "MISSING_STATE",
     message: string,
   ) {
@@ -39,6 +41,40 @@ export class RegistryError extends Error {
 
 export function listVehicles(state: HouseholdState): VehicleRecord[] {
   return [...state.vehicles].sort((a, b) => a.enrolledAt.localeCompare(b.enrolledAt));
+}
+
+export function findVehiclesByLabel(
+  state: HouseholdState,
+  label: string,
+): VehicleRecord[] {
+  const needle = label.trim().toLowerCase();
+  if (!needle) return [];
+  return state.vehicles.filter((vehicle) => vehicle.label.toLowerCase() === needle);
+}
+
+export function requireVehicleByLabel(
+  state: HouseholdState,
+  label: string,
+): VehicleRecord {
+  const matches = findVehiclesByLabel(state, label);
+  if (matches.length === 0) {
+    throw new RegistryError("NOT_FOUND", "No enrolled vehicle matches that label.");
+  }
+  if (matches.length > 1) {
+    throw new RegistryError(
+      "AMBIGUOUS_LABEL",
+      "More than one enrolled vehicle uses that label. Rename one of them first.",
+    );
+  }
+  return matches[0]!;
+}
+
+export function selectVehicles(
+  state: HouseholdState,
+  labels?: string[],
+): VehicleRecord[] {
+  if (!labels || labels.length === 0) return listVehicles(state);
+  return labels.map((label) => requireVehicleByLabel(state, label));
 }
 
 export function enrollVehicle(
@@ -98,12 +134,26 @@ export function renameVehicle(
   return { ...state, vehicles };
 }
 
+export function renameVehicleByLabel(
+  state: HouseholdState,
+  fromLabel: string,
+  toLabel: string,
+): HouseholdState {
+  const vehicle = requireVehicleByLabel(state, fromLabel);
+  return renameVehicle(state, vehicle.derivedId, toLabel);
+}
+
 export function removeVehicle(state: HouseholdState, derivedId: string): HouseholdState {
   const vehicles = state.vehicles.filter((vehicle) => vehicle.derivedId !== derivedId);
   if (vehicles.length === state.vehicles.length) {
     throw new RegistryError("NOT_FOUND", "No enrolled vehicle matches that identifier.");
   }
   return { ...state, vehicles };
+}
+
+export function removeVehicleByLabel(state: HouseholdState, label: string): HouseholdState {
+  const vehicle = requireVehicleByLabel(state, label);
+  return removeVehicle(state, vehicle.derivedId);
 }
 
 export function clearRegistry(state: HouseholdState): HouseholdState {
