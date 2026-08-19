@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node --experimental-strip-types \"{{FLOCK_ME_ROOT}}/runtime/src/cli.ts\" session-start --format claude --hook",
+            "timeout": 15,
+            "statusMessage": "Flock Me session review"
+          }
+        ]
+      }
+    ]
+  }
+}

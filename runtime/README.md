@@ -2,8 +2,8 @@
 
 Two aligned implementations of the same contract: plate normalization, household
 registry, fixture / unavailable adapter, atomic JSON state, and explicit checks.
-Harness skill packages invoke the TypeScript CLI. Session-start lifecycle hooks
-are not implemented.
+Harness skill packages invoke the TypeScript CLI. Startup-only `SessionStart`
+hooks call `session-start` and inject a review instruction. They do not lookup.
 
 | Surface | Use | Test |
 | --- | --- | --- |
@@ -28,8 +28,10 @@ uses `--fixture runtime/fixtures/rehearsal.json`. Commands are documented in
 
 | File | Role |
 | --- | --- |
-| `cli.ts` | Harness CLI: setup, add, list, rename, remove, clear, check, inspect, delete-data |
+| `cli.ts` | Harness CLI: setup, add, list, rename, remove, clear, check, review, checkpoint, session-start, inspect, delete-data |
 | `check.ts` | Explicit and session-mode lookup workflow |
+| `session.ts` | Startup-only source gating, checkpoints, mobility episodes, hook output |
+| `travel.ts` | Semantic travel rubric used by fixtures |
 | `normalize.ts` | Observed HIBF normalization + SHA-256 lookup tokens |
 | `registry.ts` | Enroll / list / rename / remove / clear, consent, labels |
 | `state.ts` | `~/.flock-me/state.json` or `$FLOCK_ME_STATE`, `0600`, atomic rename |

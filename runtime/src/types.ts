@@ -8,6 +8,7 @@ export type MobilityEpisode = {
   id: string;
   openedAt: string;
   vehicleDerivedIds: string[];
+  checkedAt: string | null;
 };
 
 export type SeenAuditRecord = {

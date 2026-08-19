@@ -1,0 +1,10 @@
+{
+  "id": "absent-refactors-only",
+  "title": "Ordinary coding context with no household travel",
+  "category": "absent",
+  "context": "Please refactor the auth middleware and add unit tests for the login gate. No other requests.",
+  "signals": [],
+  "expectedVerdict": "absent",
+  "expectedVehicle": "none",
+  "notes": "No mobility cues. Update the checkpoint and continue silently."
+}

@@ -23,8 +23,13 @@ appear in JSON output or persistent state.
 | `clear --confirm` | `status: cleared`. Registry, seen-record ids, and episode state are removed. Setup-offered timestamp is kept. Exit 1 without `--confirm`. |
 | `check` | Explicit check of every enrolled vehicle. No travel evidence required. See statuses below. |
 | `check --label LABEL` | Explicit check of one enrolled vehicle. |
+| `check --mode session` | Automatic-path check: silent when there is no fresh match. |
 | `check --fixture PATH` | Rehearsal only. Uses `FixtureAdapter` with the JSON file. |
-| `inspect` | Labels, seen-record count, checkpoint, and consent timestamps. No derived identifiers. |
+| `session-start [--format FORMAT] [--source SOURCE] [--hook]` | Startup-only hook entry. Injects the review instruction. Skips resume/compact/clear/fork. Does not lookup. `--format` prints harness JSON on stdout. |
+| `checkpoint` | Shows the stored session-review checkpoint. |
+| `checkpoint --mark` | Sets the checkpoint to now. |
+| `review --verdict VERDICT [--label LABEL]` | New-session travel review. `absent`/`possible`/`probable` update the checkpoint and stay silent. `confirmed` opens or reuses a mobility episode and runs a session-mode check. |
+| `inspect` | Labels, seen-record count, checkpoint, episode, and consent timestamps. No derived identifiers. |
 | `inspect --show-ids` | Same as `inspect`, plus derived identifiers. Treat the output as sensitive. |
 | `delete-data --confirm` | Deletes the state file. `status: deleted`. |
 | `help` | Prints command usage. |
@@ -39,6 +44,11 @@ appear in JSON output or persistent state.
 | `rate-limited` | 2 | Adapter reported HTTP 429 semantics. |
 | `no-match` | 0 | The available public dataset contains no matching record for the selected vehicles. |
 | `matches` | 0 | `fresh` and/or `previouslySeen` records, reported by local label. Dataset limits are included. |
+| `silent` | 0 | Session-mode check with no fresh match. `message` is empty. Do not mention Flock Me. |
+| `already-checked` | 0 | This mobility episode already had a successful lookup. Do not mention Flock Me. |
+| `instruct` | 0 | `session-start` on `startup`. Inject `instruction`; do not lookup from the hook. |
+| `skipped` | 0 | `session-start` for a non-startup source. |
+| `marked` | 0 | Checkpoint written. |
 
 A matching record means a Flock user searched the plate. It is not a camera
 sighting, a location, an investigation, or a link to the trip that triggered

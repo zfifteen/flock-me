@@ -148,6 +148,7 @@ Store the Gemini version under `skills/gemini/flock-me/`. Keep only the portable
 
 ## Session-start boundary
 
-The Flock Me product contract includes a new-session review for recent signs of household travel. A skill file does not schedule that review. Each harness requires a separate lifecycle hook or equivalent host integration.
+The Flock Me product contract includes a new-session review for recent signs of household travel. A skill file does not schedule that review. Each harness uses a separate startup-only `SessionStart` hook that injects a compact instruction. Research and per-harness history/memory notes are in [`lifecycle-hooks.md`](lifecycle-hooks.md). Hook packages are in [`hooks/`](../hooks/).
 
-The harness packages created from this specification define how the skill behaves after invocation. Hook packaging and transcript or memory access remain separate implementation work. Installation must not claim that automatic session review works until the corresponding hook has been implemented and validated for that harness.
+Installation may claim that automatic session review is wired through those hooks. It must not claim that live Have I Been Flocked lookup works. Grok's native SessionStart stdout is currently ignored; install the Claude hook file as well.
+

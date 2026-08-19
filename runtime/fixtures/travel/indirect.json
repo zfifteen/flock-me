@@ -1,0 +1,21 @@
+{
+  "id": "indirect-calendar-and-parking",
+  "title": "Two independent weak cues without an explicit trip statement",
+  "category": "indirect",
+  "context": "Memory: dentist appointment tomorrow at a downtown clinic. Also a parking receipt from last week is sitting in the project notes.",
+  "signals": [
+    {
+      "kind": "weak-cue",
+      "family": "appointment-destination",
+      "summary": "Calendar-like appointment at a physical clinic."
+    },
+    {
+      "kind": "weak-cue",
+      "family": "travel-receipt",
+      "summary": "A parking receipt is present in notes."
+    }
+  ],
+  "expectedVerdict": "probable",
+  "expectedVehicle": "none",
+  "notes": "Two independent families are probable. Automatic lookup still waits for a confirmed statement or direct artifact."
+}

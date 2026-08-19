@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "version": "0.1.0",
-  "description": "Portable Flock Me plate normalization, household registry, state, service adapter, and explicit-check CLI.",
+  "description": "Portable Flock Me plate normalization, household registry, state, service adapter, explicit-check CLI, and session-start review.",
   "bin": {
     "flock-me": "./src/cli.ts"
   },

@@ -31,7 +31,7 @@ Enter through this path only when lifecycle context explicitly requests the Floc
 
 Do not rely on a fixed trigger-phrase list. Do not claim access to conversations, computer activity, or memory that the host did not provide.
 
-Session-start lifecycle hooks are not implemented. Do not invent a hook. If this path is entered, still perform the lookup by running the explicit-check CLI after travel inference, using `--label` when the vehicle is known.
+Startup-only `SessionStart` hooks inject this path. On Gemini CLI, do not call `activate_skill` for the automatic review; follow the injected instruction and run the CLI directly. Classify travel, then run `review --verdict …` (use `--label` when the vehicle is known). Lookup only for `confirmed`. Stay silent unless `status` is `matches` with fresh records, or a first-time setup offer.
 
 ### Explicit invocation
 
@@ -59,6 +59,9 @@ If `runtime/src/cli.ts` is not on disk, stop and say the Flock Me runtime is not
 | Clear the registry | `clear --confirm` |
 | Inspect local data | `inspect` |
 | Delete all local data | `delete-data --confirm` |
+| Session-start hook (harness only) | `session-start --format … --hook` |
+| Show or set the review checkpoint | `checkpoint` / `checkpoint --mark` |
+| New-session travel review | `review --verdict absent\|possible\|probable\|confirmed [--label LABEL]` |
 
 - With no additional instruction, run `check`. Do not require travel evidence.
 - With no enrolled vehicles, `check` returns the setup offer. Present it instead of attempting a lookup.
@@ -85,10 +88,10 @@ Do not invent a second hash. Do not send a raw plate anywhere. Do not compute th
 
 ## Perform a lookup
 
-1. Run `check` or `check --label LABEL`.
-2. Read the JSON object on stdout. Show the `message` field to the user.
-3. If `status` is `unavailable`, `malformed`, or `rate-limited`, stop. State which component failed. Do not invent results.
-4. If `status` is `setup-required`, offer setup.
+1. Run `check` or `check --label LABEL` on the explicit path. Run `review --verdict confirmed` on the automatic path.
+2. Read the JSON object on stdout. Show the `message` field to the user when the path allows speech.
+3. If `status` is `unavailable`, `malformed`, or `rate-limited` on the explicit path, stop. State which component failed. Do not invent results. On the automatic path, stay silent for those statuses.
+4. If `status` is `setup-required`, offer setup (once on the automatic path).
 5. If `status` is `no-match` or `matches`, preserve the dataset-limits sentence from `message`.
 
 Never send a raw plate to the service. Never open haveibeenflocked.com on the user's behalf.
@@ -116,4 +119,4 @@ Keep raw plates out of persistent state. Do not write state files yourself.
 
 ## Respect the implementation boundary
 
-Normalization, household registry, portable state, the explicit-fail service adapter, and the explicit-check CLI live in `runtime/`. Session-start lifecycle hooks are still unimplemented. Live Have I Been Flocked lookups are not permitted. If the CLI reports `SERVICE_UNAVAILABLE`, say so.
+Normalization, household registry, portable state, the explicit-fail service adapter, the CLI, and startup-only SessionStart hooks live in this repository. Live Have I Been Flocked lookups are not permitted. If the CLI reports `SERVICE_UNAVAILABLE` on an explicit check, say so.

@@ -1,0 +1,17 @@
+{
+  "id": "direct-commute-home",
+  "title": "Explicit completed outing with a named vehicle",
+  "category": "direct",
+  "context": "Previous session, yesterday evening: I just got home. Traffic on the drive in my car was awful after the grocery run.",
+  "signals": [
+    {
+      "kind": "explicit-statement",
+      "family": "departure-arrival",
+      "summary": "User said they got home after driving."
+    }
+  ],
+  "expectedVerdict": "confirmed",
+  "expectedVehicle": "named",
+  "namedLabel": "My car",
+  "notes": "An explicit arrival plus a named household vehicle opens a mobility episode and checks that vehicle only."
+}

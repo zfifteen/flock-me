@@ -19,3 +19,5 @@ jobs:
         run: node --test runtime/test/*.test.mjs
       - name: Skill behavior sync
         run: node scripts/check-skill-sync.mjs
+      - name: Hook package check
+        run: node scripts/check-hooks.mjs

@@ -27,3 +27,11 @@ This record contains accepted product and architecture decisions. Open questions
 | 2026-08-18 | Default labels are `My car`, `Partner's car`, `Work truck`, then `Household van`. | Non-sensitive local nicknames that distinguish household vehicles without retaining plates. |
 | 2026-08-19 | Explicit checks go through `runtime/src/cli.ts` for every harness. | Skills must not reimplement lookup. Production adapter remains `UnavailableAdapter`. `--fixture` is rehearsal-only. |
 | 2026-08-19 | Keep one `skills/behavior.md` and fail CI if a `SKILL.md` body drifts. | Vendor differences belong in frontmatter and the `{{INVOKE}}` token. `scripts/check-skill-sync.mjs` is the synchronization check. |
+| 2026-08-19 | Use startup-only `SessionStart` hooks on Codex, Claude Code, Grok Build, and Gemini CLI. | The hook injects a compact instruction and does no transcript parsing or lookup. Matcher is `startup` wherever the vendor documents a source. |
+| 2026-08-19 | Treat Grok native SessionStart stdout as non-injecting; also install the Claude hook file. | Grok documents that passive-event stdout is ignored. Grok reads `.claude/settings.json`. |
+| 2026-08-19 | Gemini automatic review must not call `activate_skill`. | Gemini has no manual-only skill field and prompts for activation consent. The SessionStart hook supplies additionalContext instead. |
+| 2026-08-19 | Automatic lookup requires a `confirmed` travel verdict. | `probable` (two weak cues) is too noisy for a sensitive public-records query. Explicit invocation still bypasses travel inference. |
+| 2026-08-19 | One mobility episode lasts 12 hours and allows one successful lookup for a vehicle set. | Related outing signals must not create repeated requests. Unavailable results do not consume the episode. |
+| 2026-08-19 | Automatic results interrupt only for previously unseen matches, plus a one-time empty-registry setup offer. | Unavailable, no-match, and repeats stay silent so a coding session is not hijacked. |
+| 2026-08-19 | Distribution remains this repository. | Marketplace/plugin wrappers can reuse the hook files later. A permitted lookup contract is the release gate. |
+

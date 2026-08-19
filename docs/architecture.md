@@ -38,7 +38,8 @@ The skill does not activate from ordinary mid-session travel remarks. Each harne
 
 The hook injects a compact instruction into the first ordinary model turn of a new session. The instruction asks the skill to review only the recent history and memory the host makes available since the saved checkpoint.
 
-The hook performs no transcript parsing, travel classification, or network lookup itself.
+The hook performs no transcript parsing, travel classification, or network lookup itself. Flock Me uses `SessionStart` with matcher `startup` only. Resume, compact, clear, and fork are ignored. Packages live in `hooks/`.
+
 
 ### Household registry
 

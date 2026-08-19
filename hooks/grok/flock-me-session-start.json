@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FLOCK_ME_HOOK_FORMAT=grok node --experimental-strip-types \"{{FLOCK_ME_ROOT}}/runtime/src/cli.ts\" session-start --format grok --hook",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
