@@ -1,14 +1,14 @@
-import { mkdir, rename, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
 import { homedir } from "node:os";
-import { join } from "node:path";
 import type { HouseholdState } from "./types.ts";
 import { emptyState, STATE_VERSION } from "./types.ts";
 
 export const STATE_DIR_MODE = 0o700;
 export const STATE_FILE_MODE = 0o600;
 
-export function defaultStatePath(): string {
+export function defaultStatePath(env: NodeJS.ProcessEnv = process.env): string {
+  if (env.FLOCK_ME_STATE) return env.FLOCK_ME_STATE;
   return join(homedir(), ".flock-me", "state.json");
 }
 
@@ -88,6 +88,16 @@ function parseSeen(value: unknown) {
   };
 }
 
+export async function readState(path = defaultStatePath()): Promise<HouseholdState> {
+  try {
+    const text = await readFile(path, "utf8");
+    return parseState(JSON.parse(text));
+  } catch (error) {
+    if (isEnoent(error)) return emptyState();
+    throw error;
+  }
+}
+
 export async function writeStateAtomic(
   path: string,
   state: HouseholdState,
@@ -102,7 +112,21 @@ export async function writeStateAtomic(
   await rename(tempPath, path);
 }
 
+export async function deleteState(path = defaultStatePath()): Promise<boolean> {
+  try {
+    await unlink(path);
+    return true;
+  } catch (error) {
+    if (isEnoent(error)) return false;
+    throw error;
+  }
+}
+
 export function migrateOrEmpty(raw: unknown): HouseholdState {
   if (raw === null || raw === undefined) return emptyState();
   return parseState(raw);
+}
+
+function isEnoent(error: unknown): boolean {
+  return Boolean(error && typeof error === "object" && "code" in error && error.code === "ENOENT");
 }

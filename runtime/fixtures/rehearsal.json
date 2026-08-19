@@ -1,0 +1,19 @@
+{
+  "results": [
+    {
+      "id": "fixture-rec-testplate",
+      "identifier": "d2097ce6",
+      "agency": "Statewide Fusion Desk",
+      "operator": "***",
+      "searchTime": "2026-03-14T09:02:11.000Z",
+      "reason": "investigation",
+      "searchType": "lookup",
+      "devicesSearched": 2401,
+      "networksSearched": 88,
+      "redacted": true
+    }
+  ],
+  "nextCursor": null,
+  "hasMore": false,
+  "total": 1
+}

@@ -8,6 +8,15 @@ export {
 } from "./adapter.ts";
 export { auditRecordId } from "./audit-id.ts";
 export {
+  formatRecord,
+  runCheck,
+  type CheckMode,
+  type CheckOptions,
+  type CheckOutcome,
+  type ReportedRecord,
+} from "./check.ts";
+export { CLI_USAGE, dispatch, parseArgv, run, type CliPayload, type CliResult } from "./cli.ts";
+export {
   DATASET_LIMITS,
   DEFAULT_VEHICLE_LABELS,
   ENROLLMENT_CONSENT,
@@ -34,18 +43,25 @@ export {
   RegistryError,
   clearRegistry,
   enrollVehicle,
+  findVehiclesByLabel,
   listVehicles,
   markSetupOffered,
   removeVehicle,
+  removeVehicleByLabel,
   renameVehicle,
+  renameVehicleByLabel,
+  requireVehicleByLabel,
+  selectVehicles,
 } from "./registry.ts";
 export { classifyAndRemember } from "./seen.ts";
 export {
   STATE_DIR_MODE,
   STATE_FILE_MODE,
   defaultStatePath,
+  deleteState,
   migrateOrEmpty,
   parseState,
+  readState,
   writeStateAtomic,
 } from "./state.ts";
 export {

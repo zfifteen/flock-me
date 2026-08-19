@@ -1,21 +1,38 @@
 # Flock Me runtime
 
 Two aligned implementations of the same contract: plate normalization, household
-registry, fixture / unavailable adapter, and atomic JSON state. Harness skill
-packages stay documentation-only until their hooks exist.
+registry, fixture / unavailable adapter, atomic JSON state, and explicit checks.
+Harness skill packages invoke the TypeScript CLI. Session-start lifecycle hooks
+are not implemented.
 
 | Surface | Use | Test |
 | --- | --- | --- |
 | `src/` TypeScript | CLI / harness (`node --experimental-strip-types`, Node 22+) | `cd runtime && npm test` |
 | `*.mjs` ESM | Node 18+ and browsers via `crypto.subtle`, no build | `node --test runtime/test/*.test.mjs` |
 
+## Explicit-check CLI
+
+From the repository root:
+
+```
+node --experimental-strip-types runtime/src/cli.ts <command>
+./runtime/flock-me <command>
+```
+
+`check` is the default command. It selects every enrolled household vehicle and
+does not require travel evidence. Production uses `UnavailableAdapter`. Rehearsal
+uses `--fixture runtime/fixtures/rehearsal.json`. Commands are documented in
+[`docs/commands.md`](../docs/commands.md).
+
 ## TypeScript modules (`src/`)
 
 | File | Role |
 | --- | --- |
+| `cli.ts` | Harness CLI: setup, add, list, rename, remove, clear, check, inspect, delete-data |
+| `check.ts` | Explicit and session-mode lookup workflow |
 | `normalize.ts` | Observed HIBF normalization + SHA-256 lookup tokens |
 | `registry.ts` | Enroll / list / rename / remove / clear, consent, labels |
-| `state.ts` | `~/.flock-me/state.json`, `0600`, atomic rename |
+| `state.ts` | `~/.flock-me/state.json` or `$FLOCK_ME_STATE`, `0600`, atomic rename |
 | `adapter.ts` | `UnavailableAdapter` (production) + `FixtureAdapter` |
 | `audit-id.ts` / `seen.ts` | Stable record ids and previously-seen tracking |
 | `copy.ts` | Setup offer, consent, default labels |
@@ -33,7 +50,7 @@ packages stay documentation-only until their hooks exist.
 
 ## Persistence
 
-TypeScript runtime: `~/.flock-me/state.json`.
+TypeScript runtime: `$FLOCK_ME_STATE` or `~/.flock-me/state.json`.
 
 ESM runtime:
 

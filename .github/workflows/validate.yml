@@ -1,0 +1,21 @@
+name: validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: TypeScript runtime tests
+        run: npm test
+        working-directory: runtime
+      - name: ESM runtime tests
+        run: node --test runtime/test/*.test.mjs
+      - name: Skill behavior sync
+        run: node scripts/check-skill-sync.mjs

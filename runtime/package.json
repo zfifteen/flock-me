@@ -3,9 +3,13 @@
   "private": true,
   "type": "module",
   "version": "0.1.0",
-  "description": "Portable Flock Me plate normalization, household registry, state, and service adapter.",
+  "description": "Portable Flock Me plate normalization, household registry, state, service adapter, and explicit-check CLI.",
+  "bin": {
+    "flock-me": "./src/cli.ts"
+  },
   "scripts": {
-    "test": "node --experimental-strip-types --test src/*.test.ts"
+    "test": "node --experimental-strip-types --test src/*.test.ts",
+    "flock-me": "node --experimental-strip-types src/cli.ts"
   },
   "engines": {
     "node": ">=22"

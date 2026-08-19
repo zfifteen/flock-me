@@ -1,10 +1,3 @@
----
-name: flock-me
-description: Check enrolled household vehicle identifiers against public, FOIA-derived Flock Safety audit records and manage household vehicle enrollment. Use when the user explicitly invokes `/flock-me`. A trusted SessionStart integration may also load this skill to perform the new-session household-travel review.
-argument-hint: "[setup|add|list|remove|clear|check]"
-disable-model-invocation: true
----
-
 # Flock Me
 
 Let the user know when public records show that someone using the Flock network searched for an enrolled household vehicle.
@@ -42,7 +35,7 @@ Session-start lifecycle hooks are not implemented. Do not invent a hook. If this
 
 ### Explicit invocation
 
-Enter through this path when the user invokes /flock-me or selects Flock Me from the skill command list.
+Enter through this path when the user invokes {{INVOKE}} or selects Flock Me from the skill command list.
 
 Route every explicit action through the repository CLI. Do not reimplement normalization, enrollment, or lookup in the conversation.
 

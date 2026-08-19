@@ -31,14 +31,22 @@ Use a project-scoped target only when the user requests one:
 
 ## Preserve the current implementation boundary
 
-`runtime/` now provides plate normalization, household registry, portable state, and an explicit-fail Have I Been Flocked adapter. Session-start lifecycle hooks are not implemented. Live lookups are not permitted.
+`runtime/` provides plate normalization, household registry, portable state, an explicit-fail Have I Been Flocked adapter, and the explicit-check CLI (`runtime/src/cli.ts`). Session-start lifecycle hooks are not implemented. Live lookups are not permitted.
 
-Installation enables the harness-specific skill instructions and direct invocation surface. Do not claim that automatic new-session review or live record lookup works.
+Every explicit Flock Me action must go through the CLI:
+
+```
+node --experimental-strip-types runtime/src/cli.ts <command>
+```
+
+Commands and expected results are in [`docs/commands.md`](docs/commands.md). Installation copies the harness skill instructions. The CLI stays in this repository until packaging copies runtime components. Do not claim that automatic new-session review or live record lookup works.
+
 
 Enrollment may accept a real plate only through the runtime. The raw plate must be discarded after derivation. Never persist or log the plate.
 
 ## Maintain the harness packages
 
-Keep the behavioral sections of all four `SKILL.md` files synchronized. Restrict differences to vendor frontmatter, explicit invocation syntax, and documented harness behavior.
+Keep the behavioral sections of all four `SKILL.md` files synchronized with [`skills/behavior.md`](skills/behavior.md). Restrict differences to vendor frontmatter and the `{{INVOKE}}` token. Run `node scripts/check-skill-sync.mjs` after editing skill packages.
+
 
 Use [`docs/harness-skill-specifications.md`](docs/harness-skill-specifications.md) as the source for vendor packaging and discovery rules.
