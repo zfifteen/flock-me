@@ -21,3 +21,5 @@ jobs:
         run: node scripts/check-skill-sync.mjs
       - name: Hook package check
         run: node scripts/check-hooks.mjs
+      - name: Harness discovery and invocation
+        run: node scripts/check-discovery.mjs
