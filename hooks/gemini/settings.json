@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "name": "flock-me-session-start",
+            "type": "command",
+            "command": "node --experimental-strip-types \"{{FLOCK_ME_ROOT}}/runtime/src/cli.ts\" session-start --format gemini --hook",
+            "timeout": 15000,
+            "description": "Inject the Flock Me new-session travel review without activating the skill."
+          }
+        ]
+      }
+    ]
+  }
+}

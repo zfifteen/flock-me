@@ -65,11 +65,30 @@ export {
   writeStateAtomic,
 } from "./state.ts";
 export {
+  detectHookFormat,
+  episodeId,
+  formatHookOutput,
+  isEpisodeOpen,
+  isStartupOnly,
+  markCheckpoint,
+  markEpisodeChecked,
+  openOrReuseEpisode,
+  planReview,
+  sessionStartInstruction,
+  sourceFromHookInput,
+  type HookFormat,
+  type ReviewPlan,
+  type SessionSource,
+  type TravelVerdict,
+} from "./session.ts";
+export { evaluateTravel, parseTravelFixture, type TravelFixture, type TravelSignal } from "./travel.ts";
+export {
   STATE_VERSION,
   emptyState,
   type AuditRecord,
   type HouseholdState,
   type LookupRequest,
   type LookupResponse,
+  type MobilityEpisode,
   type VehicleRecord,
 } from "./types.ts";

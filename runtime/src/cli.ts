@@ -24,6 +24,19 @@ import {
   renameVehicleByLabel,
 } from "./registry.ts";
 import {
+  detectHookFormat,
+  formatHookOutput,
+  isStartupOnly,
+  markCheckpoint,
+  markEpisodeChecked,
+  planReview,
+  sessionStartInstruction,
+  sourceFromHookInput,
+  type HookFormat,
+  type SessionSource,
+  type TravelVerdict,
+} from "./session.ts";
+import {
   defaultStatePath,
   deleteState,
   readState,
@@ -40,13 +53,17 @@ Commands:
   rename --from LABEL --to LABEL
   remove --label LABEL
   clear --confirm
-  check [--label LABEL] [--fixture PATH]
+  check [--label LABEL] [--mode explicit|session] [--fixture PATH]
+  review --verdict absent|possible|probable|confirmed [--label LABEL] [--fixture PATH]
+  checkpoint [--mark]
+  session-start [--format claude|codex|gemini|grok|plain] [--source SOURCE] [--hook]
   inspect [--show-ids]
   delete-data --confirm
   help
 
 Default command is check: every enrolled household vehicle, no travel evidence
 required. Production lookups use UnavailableAdapter. --fixture is rehearsal only.
+session-start is the startup-only hook entry. review is the new-session travel path.
 
 State: $FLOCK_ME_STATE or ~/.flock-me/state.json
 `;
@@ -64,6 +81,7 @@ export type CliPayload = {
 export type CliResult = {
   exitCode: number;
   payload: CliPayload;
+  stdout?: string;
 };
 
 type ParsedArgs = {
@@ -172,12 +190,116 @@ export async function createAdapter(flags: CliFlags): Promise<FlockServiceAdapte
   return new UnavailableAdapter();
 }
 
+function parseVerdict(value: string | undefined): TravelVerdict | undefined {
+  if (
+    value === "absent" ||
+    value === "possible" ||
+    value === "probable" ||
+    value === "confirmed"
+  ) {
+    return value;
+  }
+  return undefined;
+}
+
+function parseFormat(value: string | undefined, env: NodeJS.ProcessEnv): HookFormat {
+  if (
+    value === "claude" ||
+    value === "codex" ||
+    value === "gemini" ||
+    value === "grok" ||
+    value === "plain"
+  ) {
+    return value;
+  }
+  return detectHookFormat(env);
+}
+
+function parseSourceFlag(value: string | undefined): SessionSource | undefined {
+  if (!value) return undefined;
+  if (
+    value === "startup" ||
+    value === "resume" ||
+    value === "clear" ||
+    value === "compact" ||
+    value === "fork" ||
+    value === "unknown"
+  ) {
+    return value;
+  }
+  throw new UsageError("source must be startup, resume, clear, compact, fork, or unknown.");
+}
+
+export async function readHookInput(flags: CliFlags): Promise<Record<string, unknown> | null> {
+  if (!flagBool(flags, "hook")) return null;
+  const chunks: Buffer[] = [];
+  for await (const chunk of process.stdin) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+  const text = Buffer.concat(chunks).toString("utf8").trim();
+  if (!text) return null;
+  try {
+    const parsed = JSON.parse(text) as unknown;
+    if (parsed && typeof parsed === "object") return parsed as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function sessionStartResult(
+  state: HouseholdState,
+  flags: CliFlags,
+  now: string,
+  hookInput: Record<string, unknown> | null = null,
+  env: NodeJS.ProcessEnv = process.env,
+): { result: CliResult; nextState: HouseholdState; deleteFile: boolean } {
+  const source =
+    parseSourceFlag(flagString(flags, "source")) ?? sourceFromHookInput(hookInput);
+  const format = parseFormat(flagString(flags, "format"), env);
+  const startup = isStartupOnly(source);
+  const instruction = startup
+    ? sessionStartInstruction({
+        source,
+        checkpoint: state.checkpoint,
+        labels: listVehicles(state).map((vehicle) => vehicle.label),
+        setupOffered: Boolean(state.setupOfferedAt),
+        episodeOpen: Boolean(state.episode),
+      })
+    : "";
+  const payload: CliPayload = {
+    ok: true,
+    command: "session-start",
+    status: startup ? "instruct" : "skipped",
+    message: startup
+      ? "Inject the session-start review instruction. Do not lookup from the hook."
+      : `Skipping Flock Me session review for source=${source}.`,
+    source,
+    format,
+    checkpoint: state.checkpoint,
+    labels: listVehicles(state).map((vehicle) => vehicle.label),
+    instruction,
+  };
+  const hookMode = flagBool(flags, "hook") || Boolean(flagString(flags, "format"));
+  return {
+    result: {
+      exitCode: 0,
+      payload,
+      stdout: hookMode ? formatHookOutput(format, instruction) : undefined,
+    },
+    nextState: state,
+    deleteFile: false,
+  };
+}
+
 export async function dispatch(
   command: string,
   flags: CliFlags,
   state: HouseholdState,
   adapter: FlockServiceAdapter,
   now = new Date().toISOString(),
+  hookInput: Record<string, unknown> | null = null,
+  env: NodeJS.ProcessEnv = process.env,
 ): Promise<{ result: CliResult; nextState: HouseholdState; deleteFile: boolean }> {
   switch (command) {
     case "help":
@@ -315,11 +437,12 @@ export async function dispatch(
       };
     }
     case "check": {
+      const mode = flagString(flags, "mode") === "session" ? "session" : "explicit";
       const outcome = await runCheck(state, {
         adapter,
         labels: flagStrings(flags, "label"),
         now,
-        mode: "explicit",
+        mode,
       });
       return {
         result: fromCheck("check", outcome),
@@ -327,6 +450,110 @@ export async function dispatch(
           outcome.status === "setup-required" ? markSetupOffered(state, now) : outcome.state,
         deleteFile: false,
       };
+    }
+    case "checkpoint": {
+      if (flagBool(flags, "mark")) {
+        const nextState = markCheckpoint(state, now);
+        return {
+          result: {
+            exitCode: 0,
+            payload: {
+              ok: true,
+              command: "checkpoint",
+              status: "marked",
+              message: `Checkpoint set to ${now}.`,
+              checkpoint: now,
+            },
+          },
+          nextState,
+          deleteFile: false,
+        };
+      }
+      return {
+        result: {
+          exitCode: 0,
+          payload: {
+            ok: true,
+            command: "checkpoint",
+            status: state.checkpoint ? "current" : "none",
+            message: state.checkpoint
+              ? `Last session-review checkpoint: ${state.checkpoint}.`
+              : "No session-review checkpoint is stored.",
+            checkpoint: state.checkpoint,
+          },
+        },
+        nextState: state,
+        deleteFile: false,
+      };
+    }
+    case "review": {
+      const verdict = parseVerdict(flagString(flags, "verdict"));
+      if (!verdict) throw new UsageError("review requires --verdict absent|possible|probable|confirmed.");
+      const planned = planReview(state, {
+        verdict,
+        labels: flagStrings(flags, "label"),
+        now,
+      });
+      if (planned.plan.action !== "check") {
+        const status =
+          planned.plan.action === "setup-required"
+            ? "setup-required"
+            : planned.plan.action === "already-checked"
+              ? "already-checked"
+              : "silent";
+        const nextState =
+          planned.plan.action === "setup-required"
+            ? markSetupOffered(planned.state, now)
+            : planned.state;
+        return {
+          result: {
+            exitCode: 0,
+            payload: {
+              ok: true,
+              command: "review",
+              status:
+                planned.plan.action === "setup-required" && !state.setupOfferedAt
+                  ? "setup-required"
+                  : status,
+              message:
+                planned.plan.action === "setup-required" && !state.setupOfferedAt
+                  ? FIRST_SESSION_SETUP_OFFER
+                  : planned.plan.message,
+              verdict,
+              interrupt: planned.plan.interrupt,
+              labels: planned.plan.labels,
+            },
+          },
+          nextState,
+          deleteFile: false,
+        };
+      }
+      const outcome = await runCheck(planned.state, {
+        adapter,
+        labels: flagStrings(flags, "label"),
+        now,
+        mode: "session",
+      });
+      const lookedUp =
+        outcome.status === "matches" ||
+        outcome.status === "no-match" ||
+        outcome.status === "silent";
+      const checkedState = markCheckpoint(
+        lookedUp ? markEpisodeChecked(outcome.state, now) : outcome.state,
+        now,
+      );
+      const result = fromCheck("review", outcome);
+      result.payload.verdict = verdict;
+      result.payload.interrupt = outcome.status === "matches" && outcome.fresh.length > 0;
+      return {
+        result,
+        nextState:
+          outcome.status === "setup-required" ? markSetupOffered(planned.state, now) : checkedState,
+        deleteFile: false,
+      };
+    }
+    case "session-start": {
+      return sessionStartResult(state, flags, now, hookInput, env);
     }
     case "inspect": {
       const showIds = flagBool(flags, "show-ids");
@@ -344,6 +571,9 @@ export async function dispatch(
             vehicles,
             seenRecordCount: state.seenRecords.length,
             checkpoint: state.checkpoint,
+            episode: state.episode
+              ? { id: state.episode.id, openedAt: state.episode.openedAt, checkedAt: state.episode.checkedAt }
+              : null,
             consentAt: state.consentAt,
             setupOfferedAt: state.setupOfferedAt,
             datasetLimits: DATASET_LIMITS,
@@ -398,11 +628,16 @@ export async function run(
     const statePath = flagString(parsed.flags, "state") ?? defaultStatePath(env);
     const state = await readState(statePath);
     const adapter = await createAdapter(parsed.flags);
+    const hookInput =
+      parsed.command === "session-start" ? await readHookInput(parsed.flags) : null;
     const { result, nextState, deleteFile } = await dispatch(
       parsed.command,
       parsed.flags,
       state,
       adapter,
+      new Date().toISOString(),
+      hookInput,
+      env,
     );
     if (deleteFile) {
       await deleteState(statePath);
@@ -427,7 +662,9 @@ export async function run(
 
 export async function main(argv: string[] = process.argv): Promise<number> {
   const result = await run(argv);
-  process.stdout.write(`${JSON.stringify(result.payload, null, 2)}\n`);
+  process.stdout.write(
+    result.stdout !== undefined ? result.stdout : `${JSON.stringify(result.payload, null, 2)}\n`,
+  );
   return result.exitCode;
 }
 

@@ -71,6 +71,7 @@ function parseEpisode(value: unknown): HouseholdState["episode"] {
     id: row.id,
     openedAt: row.openedAt,
     vehicleDerivedIds: row.vehicleDerivedIds.filter((id): id is string => typeof id === "string"),
+    checkedAt: typeof row.checkedAt === "string" ? row.checkedAt : null,
   };
 }
 

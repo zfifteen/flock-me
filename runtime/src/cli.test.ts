@@ -102,4 +102,50 @@ describe("explicit-check CLI", () => {
       await assert.rejects(readFile(statePath, "utf8"), { code: "ENOENT" });
     });
   });
+
+  it("runs startup-only session-start, checkpoint, and confirmed review", async () => {
+    await withState(async (_statePath, env) => {
+      const skipped = await run(argv("session-start", "--source", "compact"), env);
+      assert.equal(skipped.payload.status, "skipped");
+      assert.equal(skipped.stdout, undefined);
+
+      const hooked = await run(
+        argv("session-start", "--format", "claude", "--source", "startup"),
+        env,
+      );
+      assert.equal(hooked.payload.status, "instruct");
+      assert.match(String(hooked.stdout), /additionalContext/);
+      assert.match(String(hooked.stdout), /activate_skill/);
+      assert.equal(JSON.stringify(hooked.payload).includes("TESTPLATE"), false);
+
+      await run(argv("add", "--plate", "TESTPLATE", "--consent", "--label", "My car"), env);
+      const marked = await run(argv("checkpoint", "--mark"), env);
+      assert.equal(marked.payload.status, "marked");
+
+      const silent = await run(argv("review", "--verdict", "absent"), env);
+      assert.equal(silent.payload.status, "silent");
+      assert.equal(silent.payload.interrupt, false);
+
+      const confirmed = await run(
+        argv("review", "--verdict", "confirmed", "--fixture", FIXTURE),
+        env,
+      );
+      assert.equal(confirmed.payload.status, "matches");
+      assert.equal(confirmed.payload.interrupt, true);
+      assert.match(String(confirmed.payload.message), /My car/);
+
+      const again = await run(
+        argv("review", "--verdict", "confirmed", "--fixture", FIXTURE),
+        env,
+      );
+      assert.equal(again.payload.status, "already-checked");
+      assert.equal(again.payload.interrupt, false);
+
+      const sessionCheck = await run(
+        argv("check", "--mode", "session", "--fixture", FIXTURE),
+        env,
+      );
+      assert.equal(sessionCheck.payload.status, "silent");
+    });
+  });
 });

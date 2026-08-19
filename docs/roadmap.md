@@ -1,6 +1,6 @@
 # Roadmap
 
-Flock Me currently has product requirements, architecture boundaries, harness-specific skill packages, installation routing, project documentation, a TypeScript runtime, a dependency-free ESM runtime for plate normalization, household enrollment, state, and an explicit-fail service adapter, and an explicit-check CLI wired through every harness. Live Have I Been Flocked lookups remain unavailable until a permitted contract exists.
+Flock Me currently has product requirements, architecture boundaries, harness-specific skill packages, installation routing, project documentation, a TypeScript runtime, a dependency-free ESM runtime for plate normalization, household enrollment, state, and an explicit-fail service adapter, an explicit-check CLI wired through every harness, and startup-only SessionStart hooks that inject a new-session travel review. Live Have I Been Flocked lookups remain unavailable until a permitted contract exists.
 
 ## Critical path
 
@@ -29,17 +29,17 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 
 ## Session-start behavior
 
-- [ ] Research lifecycle-hook specifications for Codex, Claude Code, Grok Build, and Gemini CLI.
-- [ ] Implement startup-only hooks for all four harnesses.
-- [ ] Determine what history, transcripts, and memory each harness exposes.
-- [ ] Define the session-review checkpoint.
-- [ ] Define deterministic mobility-episode boundaries.
-- [ ] Create the semantic travel-detection rubric.
-- [ ] Decide the confidence threshold for triggering a lookup.
-- [ ] Decide which vehicle to check when context is ambiguous.
-- [ ] Prevent repeated checks for one travel episode.
-- [ ] Define when an automatic result should interrupt the current conversation.
-- [ ] Resolve Gemini's activation-consent limitation for passive checks.
+- [x] ~~Research lifecycle-hook specifications for Codex, Claude Code, Grok Build, and Gemini CLI.~~
+- [x] ~~Implement startup-only hooks for all four harnesses.~~
+- [x] ~~Determine what history, transcripts, and memory each harness exposes.~~
+- [x] ~~Define the session-review checkpoint.~~
+- [x] ~~Define deterministic mobility-episode boundaries.~~
+- [x] ~~Create the semantic travel-detection rubric.~~
+- [x] ~~Decide the confidence threshold for triggering a lookup.~~
+- [x] ~~Decide which vehicle to check when context is ambiguous.~~
+- [x] ~~Prevent repeated checks for one travel episode.~~
+- [x] ~~Define when an automatic result should interrupt the current conversation.~~
+- [x] ~~Resolve Gemini's activation-consent limitation for passive checks.~~
 
 ## Onboarding and privacy
 
@@ -58,29 +58,29 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 - [x] ~~Add adapter fixtures for matches, no matches, redactions, and malformed records.~~
 - [x] ~~Test multiple-vehicle batching.~~
 - [x] ~~Test audit-record deduplication.~~
-- [ ] Create travel-context fixtures covering direct, indirect, ambiguous, and absent travel.
-- [ ] Test session checkpoints and repeated-session behavior.
+- [x] ~~Create travel-context fixtures covering direct, indirect, ambiguous, and absent travel.~~
+- [x] ~~Test session checkpoints and repeated-session behavior.~~
 - [ ] Add harness-specific discovery and invocation tests.
 - [ ] Add complete end-to-end tests using non-sensitive test plates.
 - [x] ~~Verify that every result preserves the exact audit-record meaning and dataset limitations.~~
 
 ## Packaging and installation
 
-- [ ] Extend `AGENTS.md` to install hooks and runtime components after they exist.
+- [x] ~~Extend `AGENTS.md` to install hooks and runtime components after they exist.~~
 - [x] ~~Add a synchronization check so the four `SKILL.md` behavior sections cannot drift.~~
-- [ ] Add harness-specific hook configuration packages.
+- [x] ~~Add harness-specific hook configuration packages.~~
 - [ ] Test user-level and project-level installation for every harness.
-- [ ] Define uninstall and upgrade behavior.
-- [ ] Add compatibility requirements and minimum harness versions.
-- [ ] Decide whether distribution remains repository-based or uses vendor plugin and marketplace formats.
+- [x] ~~Define uninstall and upgrade behavior.~~
+- [x] ~~Add compatibility requirements and minimum harness versions.~~
+- [x] ~~Decide whether distribution remains repository-based or uses vendor plugin and marketplace formats.~~
 
 ## Documentation and release
 
 - [ ] Replace draft installation language after the integration works.
-- [ ] Add setup and usage examples.
+- [x] ~~Add setup and usage examples.~~
 - [x] ~~Document every command and expected result.~~
-- [ ] Add a security and privacy section to the README.
-- [ ] Add troubleshooting instructions.
+- [x] ~~Add a security and privacy section to the README.~~
+- [x] ~~Add troubleshooting instructions.~~
 - [x] ~~Choose an open-source license and add `LICENSE`.~~
 - [ ] Add contribution guidance when outside contributions are desired.
 - [x] ~~Add continuous integration for validation and cross-package consistency.~~
@@ -90,4 +90,4 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 
 ## Recommended next milestone
 
-Research lifecycle-hook specifications for Codex, Claude Code, Grok Build, and Gemini CLI. Explicit checks are wired through the runtime CLI. Live lookups remain blocked on a permitted Have I Been Flocked contract.
+Add harness-specific discovery and invocation tests, then a clean-machine installation test of the skill plus startup-only hooks. Live lookups remain blocked on a permitted Have I Been Flocked contract.

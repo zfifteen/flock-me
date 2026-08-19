@@ -24,7 +24,8 @@ Flock Me turns scattered public surveillance records into persistent personal aw
 
 ### Status
 
-Flock Me is not operational for live lookups. Harness-specific skill packages exist for Codex, Claude Code, Grok Build, and Gemini CLI. The TypeScript runtime implements plate normalization, household enrollment, portable state, an explicit-fail service adapter, and an explicit-check CLI wired through every harness. Session-start lifecycle hooks are not implemented. Have I Been Flocked does not permit automated access.
+Flock Me is not operational for live lookups. Harness-specific skill packages exist for Codex, Claude Code, Grok Build, and Gemini CLI. The TypeScript runtime implements plate normalization, household enrollment, portable state, an explicit-fail service adapter, an explicit-check CLI, and session-start / review commands. Startup-only `SessionStart` hooks inject a compact new-session review instruction. Have I Been Flocked does not permit automated access.
+
 
 
 ### Supported harnesses
@@ -36,7 +37,8 @@ Flock Me is not operational for live lookups. Harness-specific skill packages ex
 | Grok Build | [`skills/grok-build/flock-me/`](skills/grok-build/flock-me/) | `/flock-me` |
 | Gemini CLI | [`skills/gemini/flock-me/`](skills/gemini/flock-me/) | Ask Gemini to use Flock Me and approve activation |
 
-To install the draft, point a supported agent at this repository and ask it to install Flock Me for its harness. [`AGENTS.md`](AGENTS.md) provides the exact source, target, and verification rules. Explicit checks run through [`runtime/src/cli.ts`](runtime/src/cli.ts). Commands are documented in [`docs/commands.md`](docs/commands.md). Do not claim that automatic new-session review or live record lookup works.
+To install the draft, point a supported agent at this repository and ask it to install Flock Me for its harness. [`AGENTS.md`](AGENTS.md) provides the exact source, target, hook, and verification rules. Explicit checks run through [`runtime/src/cli.ts`](runtime/src/cli.ts). Commands are documented in [`docs/commands.md`](docs/commands.md). Setup examples are in [`docs/usage.md`](docs/usage.md). Do not claim that live record lookup works.
+
 
 
 ### Activation contract
@@ -72,9 +74,15 @@ The public dataset is incomplete and delayed because it is assembled from public
 
 - [`skills/`](skills/) contains the Codex, Claude Code, Grok Build, and Gemini CLI packages.
 - [`skills/behavior.md`](skills/behavior.md) is the shared skill behavior contract.
+- [`hooks/`](hooks/) contains startup-only SessionStart packages for the four harnesses.
 - [`runtime/`](runtime/) contains the TypeScript CLI, ESM modules, and tests.
-- [`AGENTS.md`](AGENTS.md) routes installation requests to the correct harness package.
+- [`AGENTS.md`](AGENTS.md) routes installation, upgrade, and uninstall requests.
 - [`docs/commands.md`](docs/commands.md) documents every CLI command and expected result.
+- [`docs/usage.md`](docs/usage.md) has setup and usage examples.
+- [`docs/lifecycle-hooks.md`](docs/lifecycle-hooks.md) records vendor hook and host-context research.
+- [`docs/session-review.md`](docs/session-review.md) is the checkpoint, episode, and travel-review contract.
+- [`docs/troubleshooting.md`](docs/troubleshooting.md) covers discovery, hooks, and common failures.
+- [`docs/threat-model.md`](docs/threat-model.md) is the local-data and privacy threat model.
 - [`docs/design.md`](docs/design.md) preserves the evolving product requirements and research notes.
 - [`docs/architecture.md`](docs/architecture.md) defines the component boundaries and execution flows.
 - [`docs/decisions.md`](docs/decisions.md) records accepted design decisions.
@@ -82,6 +90,13 @@ The public dataset is incomplete and delayed because it is assembled from public
 - [`docs/roadmap.md`](docs/roadmap.md) tracks the remaining research, implementation, testing, and release work.
 - [`assets/hero.png`](assets/hero.png) is the selected project banner.
 - [`assets/hero-candidates/`](assets/hero-candidates/) preserves the original banner explorations.
+
+### Security and privacy
+
+Flock Me stores derived eight-character lookup tokens, optional nicknames, checkpoints, episode metadata, and seen-record ids in `~/.flock-me/state.json` (directory `0700`, file `0600`). Raw plates are discarded after derivation and must never appear in logs or state. The shortened hash is a lookup token, not a cryptographic privacy boundary. Inspect or delete local data with `inspect` and `delete-data --confirm`. Full notes: [`docs/threat-model.md`](docs/threat-model.md).
+
+Startup-only hooks inject an instruction. They do not read transcripts or send identifiers. Automatic reviews stay silent unless a previously unseen matching record exists (or a first-time setup offer). Live HTTP to Have I Been Flocked remains off.
+
 
 ### Implementation sequence
 
@@ -91,6 +106,7 @@ The public dataset is incomplete and delayed because it is assembled from public
 4. Implement and test enrollment, lookup, deduplication, and checkpoint state.
 5. Implement the new-session lifecycle hook.
 6. Validate the complete skill without installing it globally.
+
 
 ### Primary public source
 

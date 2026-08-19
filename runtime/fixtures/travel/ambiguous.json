@@ -1,0 +1,16 @@
+{
+  "id": "ambiguous-which-vehicle",
+  "title": "Confirmed travel that does not name a household vehicle",
+  "category": "ambiguous",
+  "context": "We are leaving in ten minutes to pick up dinner across town. Do not wait up.",
+  "signals": [
+    {
+      "kind": "explicit-statement",
+      "family": "departure-arrival",
+      "summary": "Household members are departing for an outing now."
+    }
+  ],
+  "expectedVerdict": "confirmed",
+  "expectedVehicle": "all",
+  "notes": "Travel is confirmed but the vehicle is unnamed, so the review checks every enrolled vehicle in one batch."
+}

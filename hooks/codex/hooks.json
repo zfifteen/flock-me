@@ -1,0 +1,19 @@
+{
+  "description": "Flock Me startup-only session review. Does not parse transcripts or call the lookup service.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node --experimental-strip-types \"{{FLOCK_ME_ROOT}}/runtime/src/cli.ts\" session-start --format codex --hook",
+            "statusMessage": "Flock Me session review",
+            "timeout": 15,
+            "additionalContextLimit": 2500
+          }
+        ]
+      }
+    ]
+  }
+}
