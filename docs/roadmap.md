@@ -36,7 +36,6 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 - [x] ~~Define deterministic mobility-episode boundaries.~~
 - [x] ~~Create the semantic travel-detection rubric.~~
 - [x] ~~Decide the confidence threshold for triggering a lookup.~~
-- [x] ~~Decide which vehicle to check when context is ambiguous.~~
 - [x] ~~Prevent repeated checks for one travel episode.~~
 - [x] ~~Define when an automatic result should interrupt the current conversation.~~
 - [x] ~~Resolve Gemini's activation-consent limitation for passive checks.~~
@@ -60,7 +59,7 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 - [x] ~~Test audit-record deduplication.~~
 - [x] ~~Create travel-context fixtures covering direct, indirect, ambiguous, and absent travel.~~
 - [x] ~~Test session checkpoints and repeated-session behavior.~~
-- [ ] Add harness-specific discovery and invocation tests.
+- [x] ~~Add harness-specific discovery and invocation tests.~~
 - [ ] Add complete end-to-end tests using non-sensitive test plates.
 - [x] ~~Verify that every result preserves the exact audit-record meaning and dataset limitations.~~
 
@@ -90,4 +89,4 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 
 ## Recommended next milestone
 
-Add harness-specific discovery and invocation tests, then a clean-machine installation test of the skill plus startup-only hooks. Live lookups remain blocked on a permitted Have I Been Flocked contract.
+Perform a clean-machine installation test of the skill plus startup-only hooks, then add complete end-to-end tests using non-sensitive test plates. Live lookups remain blocked on a permitted Have I Been Flocked contract.
