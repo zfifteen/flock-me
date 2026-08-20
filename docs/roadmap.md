@@ -81,7 +81,7 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 - [x] ~~Add a security and privacy section to the README.~~
 - [x] ~~Add troubleshooting instructions.~~
 - [x] ~~Choose an open-source license and add `LICENSE`.~~
-- [ ] Add contribution guidance when outside contributions are desired.
+- [x] ~~Add contribution guidance when outside contributions are desired.~~
 - [x] ~~Add continuous integration for validation and cross-package consistency.~~
 - [ ] Create the release checklist and versioning policy.
 - [ ] Perform a clean-machine installation test.
