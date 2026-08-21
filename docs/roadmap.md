@@ -83,7 +83,7 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 - [x] ~~Choose an open-source license and add `LICENSE`.~~
 - [x] ~~Add contribution guidance when outside contributions are desired.~~
 - [x] ~~Add continuous integration for validation and cross-package consistency.~~
-- [ ] Create the release checklist and versioning policy.
+- [x] ~~Create the release checklist and versioning policy.~~
 - [ ] Perform a clean-machine installation test.
 - [ ] Publish and tag the first operational release.
 
