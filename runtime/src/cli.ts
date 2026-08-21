@@ -572,7 +572,11 @@ export async function dispatch(
             seenRecordCount: state.seenRecords.length,
             checkpoint: state.checkpoint,
             episode: state.episode
-              ? { id: state.episode.id, openedAt: state.episode.openedAt, checkedAt: state.episode.checkedAt }
+              ? {
+                  ...(showIds ? { id: state.episode.id } : {}),
+                  openedAt: state.episode.openedAt,
+                  checkedAt: state.episode.checkedAt,
+                }
               : null,
             consentAt: state.consentAt,
             setupOfferedAt: state.setupOfferedAt,

@@ -1,0 +1,33 @@
+{
+  "results": [
+    {
+      "id": "e2e-rec-daily",
+      "identifier": "d2097ce6",
+      "agency": "Example County Sheriff",
+      "operator": "***",
+      "searchTime": "2026-04-02T14:11:00.000Z",
+      "reason": "investigation",
+      "caseNumber": "26-E2E-1",
+      "searchType": "lookup",
+      "devicesSearched": 18,
+      "networksSearched": 3,
+      "redacted": true
+    },
+    {
+      "id": "e2e-rec-spare",
+      "identifier": "e8513079",
+      "agency": "Statewide Fusion Desk",
+      "operator": "A. Roe",
+      "searchTime": "2026-04-03T08:40:00.000Z",
+      "reason": "stolen vehicle",
+      "caseNumber": "26-E2E-2",
+      "searchType": "lookup",
+      "devicesSearched": 91,
+      "networksSearched": 7,
+      "redacted": false
+    }
+  ],
+  "nextCursor": null,
+  "hasMore": false,
+  "total": 2
+}
