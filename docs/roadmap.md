@@ -60,7 +60,7 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 - [x] ~~Create travel-context fixtures covering direct, indirect, ambiguous, and absent travel.~~
 - [x] ~~Test session checkpoints and repeated-session behavior.~~
 - [x] ~~Add harness-specific discovery and invocation tests.~~
-- [ ] Add complete end-to-end tests using non-sensitive test plates.
+- [x] ~~Add complete end-to-end tests using non-sensitive test plates.~~
 - [x] ~~Verify that every result preserves the exact audit-record meaning and dataset limitations.~~
 
 ## Packaging and installation
@@ -89,4 +89,4 @@ Flock Me currently has product requirements, architecture boundaries, harness-sp
 
 ## Recommended next milestone
 
-Perform a clean-machine installation test of the skill plus startup-only hooks, then add complete end-to-end tests using non-sensitive test plates. Live lookups remain blocked on a permitted Have I Been Flocked contract.
+Perform a clean-machine installation test of the skill plus startup-only hooks, including user-level and project-level installs for every harness. Live lookups remain blocked on a permitted Have I Been Flocked contract.
